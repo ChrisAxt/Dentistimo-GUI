@@ -1,6 +1,19 @@
-# Team 5  Client
+# team5-frontend
 
-Frontend  - Team 5 
+## Project setup
+```
+npm install
+```
 
-## Purpose
-This component is the UI of the system. We use Vue.js to create the GUI 
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
