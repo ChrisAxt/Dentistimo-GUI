@@ -32,9 +32,49 @@ export default {
               description: "Spannmålsgatan 20",
             },
           },
-          
+          {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [11.940386, 57.709872]
+            },
+            properties: {
+              title: "The Crown",
+              description: "Lindholmsallén 19",
+
+            }
+          }
         ],
       };
+      function buildLocationList(geojson) {
+        for (const geojson of geojson.features) {
+          /* Add a new listing section to the sidebar. */
+          const listings = document.getElementById('listings');
+          const listing = listings.appendChild(document.createElement('div'));
+          /* Assign a unique `id` to the listing. */
+          listing.id = `listing-${geojson.properties.id}`;
+          /* Assign the `item` class to each listing for styling. */
+          listing.className = 'item';
+
+          /* Add the link to the individual listing created above. */
+          const link = listing.appendChild(document.createElement('a'));
+          link.href = '#';
+          link.className = 'title';
+          link.id = `link-${geojson.properties.id}`;
+          link.innerHTML = `${geojson.properties.title}`;
+
+          /* Add details to the individual listing. */
+          const details = listing.appendChild(document.createElement('div'));
+          details.innerHTML = `${geojson.properties.description}`;
+          if (geojson.properties.phone) {
+            details.innerHTML += ` · ${geojson.properties.phoneFormatted}`;
+          }
+          if (geojson.properties.distance) {
+            const roundedDistance = Math.round(geojson.properties.distance * 100) / 100;
+            details.innerHTML += `<div><strong>${roundedDistance} miles away</strong></div>`;
+          }
+        }
+      }
 
       // add markers to map
       for (const feature of geojson.features) {
@@ -59,12 +99,27 @@ export default {
           .addTo(map);
       }
 
+      geojson.features.forEach(function (geojson, i) {
+        geojson.properties.id = i;
+      }); //Assign a unique ID to each location/marker
+
+
+
       map.on("load", () => {
-        // TODO: Here we want to load a layer
-        // TODO: Here we want to load/setup the popup
-      });
+        map.addLayer({
+          id: 'locations',
+          type: 'circle',
+          /* Add a GeoJSON source containing place coordinates and information. */
+          source: {
+            type: 'geojson',
+            data: geojson
+          }
+          // TODO: Here we want to load a layer
+          // TODO: Here we want to load/setup the popup
+        })
+        buildLocationList(geojson);
+        });
     });
-    return {};
   },
 };
 </script>
@@ -72,9 +127,10 @@ export default {
 <style>
 #map {
   height: 100vh;
+  position: relative;
 }
 .marker {
-  background-image: url("../assets/fairy-marker.png");
+  background-image: url("../assets/be_a_denist.png");
   background-size: cover;
   width: 50px;
   height: 50px;
@@ -89,5 +145,50 @@ export default {
 .mapboxgl-popup-content {
   text-align: center;
   font-family: "Open Sans", sans-serif;
+}
+
+.listings {
+  height: 100%;
+  overflow: auto;
+  padding-bottom: 60px;
+}
+
+.listings .item {
+  border-bottom: 1px solid #eee;
+  padding: 10px;
+  text-decoration: none;
+}
+
+.listings .item:last-child { border-bottom: none; }
+
+.listings .item .title {
+  display: block;
+  color: #00853e;
+  font-weight: 700;
+}
+
+.listings .item .title small { font-weight: 400; }
+
+.listings .item.active .title,
+.listings .item .title:hover { color: #8cc63f; }
+
+.listings .item.active {
+  background-color: #f8f8f8;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+  border-left: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00853e;
+  border-radius: 0;
 }
 </style>
