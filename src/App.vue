@@ -8,11 +8,12 @@
 <script>
 import Map from "@/views/MapBox.vue";
 
+
 export default {
   components: {
     Map
   },
-};
+}
 </script>
 
 <style>
