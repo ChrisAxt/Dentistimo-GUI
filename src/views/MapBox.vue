@@ -1,5 +1,4 @@
 <template>
-  <div id="map" />
   <div class='sidebar'>
     <div class='heading'>
         <h1>Dentist locations</h1>
@@ -37,8 +36,8 @@ export default {
             },
             properties: {
               title: "Your Dentist",
-              description: "Spannmålsgatan 20  ", 
-              
+              description: "Spannmålsgatan 20  ",
+
             },
           },
           {
@@ -137,7 +136,7 @@ export default {
 
 <style>
 .button{
-  background-color: blue,
+  background-color: blue
 }
 #map {
   height: 100vh;
@@ -204,5 +203,61 @@ export default {
 ::-webkit-scrollbar-thumb {
   background: #00853e;
   border-radius: 0;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: #404040;
+  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 400;
+  line-height: 20px;
+  padding: 20px 2px;
+}
+
+a {
+  color: #404040;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #101010;
+}
+
+/* The page is split between map and sidebar - the sidebar gets 1/3, map
+gets 2/3 of the page. You can adjust this to your personal liking. */
+.sidebar {
+  position: absolute;
+  width: 33.3333%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  border-right: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.map {
+  position: absolute;
+  left: 33.3333%;
+  width: 66.6666%;
+  top: 0;
+  bottom: 0;
+}
+
+.heading {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  height: 60px;
+  line-height: 60px;
+  padding: 0 10px;
 }
 </style>
