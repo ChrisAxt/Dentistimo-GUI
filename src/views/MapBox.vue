@@ -1,5 +1,13 @@
 <template>
   <div id="map" />
+  <div class='sidebar'>
+    <div class='heading'>
+        <h1>Dentist locations</h1>
+    </div>
+    <div id='listings' class='listings'></div>
+</div>
+<div id="map" class="map"></div>
+  <div id="app"></div>
 </template>
 
 <script>
@@ -29,7 +37,8 @@ export default {
             },
             properties: {
               title: "Your Dentist",
-              description: "Spannmålsgatan 20",
+              description: "Spannmålsgatan 20  ", 
+              
             },
           },
           {
@@ -93,7 +102,9 @@ export default {
           .setPopup(
             new mapboxgl.Popup({ offset: 25 }) // add popups
               .setHTML(
-                `<h3>${feature.properties.title}</h3><p>${feature.properties.description}</p>`
+                `<h3>${feature.properties.title}</h3><p>${feature.properties.description}</p><form action="./booking">
+    <input type="submit" value="Go to Google" />
+</form>`
               )
           )
           .addTo(map);
@@ -125,6 +136,9 @@ export default {
 </script>
 
 <style>
+.button{
+  background-color: blue,
+}
 #map {
   height: 100vh;
   position: relative;
