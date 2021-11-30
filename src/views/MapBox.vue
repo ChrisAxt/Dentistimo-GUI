@@ -102,7 +102,7 @@ export default {
             new mapboxgl.Popup({ offset: 25 }) // add popups
               .setHTML(
                 `<h3>${feature.properties.title}</h3><p>${feature.properties.description}</p><form action="./booking">
-    <input type="submit" value="Go to Google" />
+    <input type="submit" value="Book" />
 </form>`
               )
           )
