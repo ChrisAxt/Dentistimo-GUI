@@ -1,24 +1,117 @@
 <template>
-  <div id="map" />
+  <div class="sidebar">
+    <div class="heading">
+      <h1>Dentistimo</h1>
+    </div>
+    <div id="listings" class="listings"></div>
+  </div>
+  <div id="map" class="map"></div>
 </template>
 
 <script>
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { onMounted } from "vue";
+import mqtt from "mqtt";
 export default {
   name: "Mapbox",
   setup() {
     onMounted(() => {
+      const { host, port, endpoint } = {
+        host: "localhost",
+        port: 9001,
+        endpoint: "/mqtt",
+        clean: true, // Reserved session
+        connectTimeout: 4000, // Time out
+        reconnectPeriod: 4000, // Reconnection interval
+        // Certification Information
+        username: "emqx",
+        password: "public",
+      };
+
+      const connectUrl = `ws://localhost:9001`;
+      try {
+        const client = mqtt.connect(connectUrl, {
+          username: "emqx",
+          password: "public",
+        });
+        client.on("connect", () => {
+          console.log("Connection succeeded!");
+        });
+        client.on("error", (error) => {
+          console.log("Connection failed", error);
+        });
+        client.on("message", (topic, message) => {
+          // this.receiveNews = this.receiveNews.concat(message);
+          console.log(`Received message ${message} from topic ${topic}`);
+        });
+      } catch (error) {
+        console.log("mqtt.connect error", error);
+      }
+
+      // const connectUrl = `ws://127.0.0.1:9001`;
+      // let client = mqtt.connect(connectUrl, {
+      //   // clientId,
+      //   clean: true,
+      //   connectTimeout: 4000,
+      //   username: "emqx",
+      //   password: "public",
+      //   reconnectPeriod: 1000,
+      // });
+
+      // client.on('connect', () => {
+      //   console.log('Connection succeeded!')
+      // })
+      // client.on('error', error => {
+      //   console.log('Connection failed', error)
+      // })
+      // client.on('message', (topic, message) => {
+      //   this.receiveNews = this.receiveNews.concat(message)
+      //   console.log(`Received message ${message} from topic ${topic}`)
+      // })
+      // const client = mqtt.connect("ws://localhost:8080");
+      // client.on("connect", () => {
+      //   console.log("Connection succeeded!");
+      // });
+      // client.on("error", (error) => {
+      //   console.log("Connection failed", error);
+      // });
+      // client.on("message", (topic, message) => {
+      //   // this.receiveNews = this.receiveNews.concat(message)
+      //   console.log(`Received message ${message} from topic ${topic}`);
+      // });
+      // console.log(client);
+      // client.on("connect", function (data) {
+      //   console.log(data);
+      //   client.subscribe("stored_new_clinic", function (err) {
+      //     console.log(err);
+      //     if (!err) {
+      //       client.publish("stored_new_clinic", "Hello mqtt");
+      //     }
+      //   });
+      // });
+
+      // client.on("message", function (topic, message) {
+      //   // message is Buffer
+      //   console.log(message.toString());
+      //   client.end();
+      // });
+
       mapboxgl.accessToken =
         "pk.eyJ1Ijoib2xnYXJhdHUiLCJhIjoiY2t3YzhrdWQ3MXZlbDJwcGF3ZmsyYXp3YSJ9.UILiP1r9n3yZ7MbHuW-ovQ";
+
+      /**
+       * Add the map to the page
+       */
       const map = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/streets-v11",
         center: [11.97456, 57.70887],
         zoom: 12.5,
+        scrollZoom: false,
       });
-      const geojson = {
+
+      const stores = {
         type: "FeatureCollection",
         features: [
           {
@@ -28,97 +121,170 @@ export default {
               coordinates: [11.969388, 57.707619],
             },
             properties: {
-              title: "Your Dentist",
-              description: "Spannmålsgatan 20",
+              phoneFormatted: "",
+              phone: "",
+              address: "",
+              city: "",
+              country: "",
+              crossStreet: "",
+              postalCode: "",
+              state: "",
             },
-          },
-          {
-            type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: [11.940386, 57.709872]
-            },
-            properties: {
-              title: "The Crown",
-              description: "Lindholmsallén 19",
-
-            }
           }
         ],
       };
-      function buildLocationList(geojson) {
-        for (const geojson of geojson.features) {
-          /* Add a new listing section to the sidebar. */
-          const listings = document.getElementById('listings');
-          const listing = listings.appendChild(document.createElement('div'));
-          /* Assign a unique `id` to the listing. */
-          listing.id = `listing-${geojson.properties.id}`;
-          /* Assign the `item` class to each listing for styling. */
-          listing.className = 'item';
 
-          /* Add the link to the individual listing created above. */
-          const link = listing.appendChild(document.createElement('a'));
-          link.href = '#';
-          link.className = 'title';
-          link.id = `link-${geojson.properties.id}`;
-          link.innerHTML = `${geojson.properties.title}`;
+      /**
+       * Assign a unique id to each store. You'll use this `id`
+       * later to associate each point on the map with a listing
+       * in the sidebar.
+       */
+      stores.features.forEach((store, i) => {
+        store.properties.id = i;
+      });
 
-          /* Add details to the individual listing. */
-          const details = listing.appendChild(document.createElement('div'));
-          details.innerHTML = `${geojson.properties.description}`;
-          if (geojson.properties.phone) {
-            details.innerHTML += ` · ${geojson.properties.phoneFormatted}`;
-          }
-          if (geojson.properties.distance) {
-            const roundedDistance = Math.round(geojson.properties.distance * 100) / 100;
-            details.innerHTML += `<div><strong>${roundedDistance} miles away</strong></div>`;
-          }
+      /**
+       * Wait until the map loads to make changes to the map.
+       */
+      map.on("load", () => {
+        /**
+         * This is where your '.addLayer()' used to be, instead
+         * add only the source without styling a layer
+         */
+        map.addSource("places", {
+          type: "geojson",
+          data: stores,
+        });
+
+        /**
+         * Add all the things to the page:
+         * - The location listings on the side of the page
+         * - The markers onto the map
+         */
+        buildLocationList(stores);
+        addMarkers();
+      });
+
+      /**
+       * Add a marker to the map for every store listing.
+       **/
+      function addMarkers() {
+        /* For each feature in the GeoJSON object above: */
+        for (const marker of stores.features) {
+          /* Create a div element for the marker. */
+          const el = document.createElement("div");
+          /* Assign a unique `id` to the marker. */
+          el.id = `marker-${marker.properties.id}`;
+          /* Assign the `marker` class to each marker for styling. */
+          el.className = "marker";
+
+          /**
+           * Create a marker using the div element
+           * defined above and add it to the map.
+           **/
+          new mapboxgl.Marker(el, { offset: [0, -23] })
+            .setLngLat(marker.geometry.coordinates)
+            .addTo(map);
+
+          /**
+           * Listen to the element and when it is clicked, do three things:
+           * 1. Fly to the point
+           * 2. Close all other popups and display popup for clicked store
+           * 3. Highlight listing in sidebar (and remove highlight for all other listings)
+           **/
+          el.addEventListener("click", (e) => {
+            /* Fly to the point */
+            flyToStore(marker);
+            /* Close all other popups and display popup for clicked store */
+            createPopUp(marker);
+            /* Highlight listing in sidebar */
+            const activeItem = document.getElementsByClassName("active");
+            e.stopPropagation();
+            if (activeItem[0]) {
+              activeItem[0].classList.remove("active");
+            }
+            const listing = document.getElementById(
+              `listing-${marker.properties.id}`
+            );
+            listing.classList.add("active");
+          });
         }
       }
 
-      // add markers to map
-      for (const feature of geojson.features) {
-        // create a HTML element for each feature
-        const el = document.createElement("div");
-        el.className = "marker";
+      /**
+       * Add a listing for each store to the sidebar.
+       **/
+      function buildLocationList(stores) {
+        for (const store of stores.features) {
+          /* Add a new listing section to the sidebar. */
+          const listings = document.getElementById("listings");
+          const listing = listings.appendChild(document.createElement("div"));
+          /* Assign a unique `id` to the listing. */
+          listing.id = `listing-${store.properties.id}`;
+          /* Assign the `item` class to each listing for styling. */
+          listing.className = "item";
 
-        // make a marker for each feature and add to the map
-        //   new mapboxgl.Marker(el)
-        //     .setLngLat(feature.geometry.coordinates)
-        //     .addTo(map);
-        // }
+          /* Add the link to the individual listing created above. */
+          const link = listing.appendChild(document.createElement("a"));
+          link.href = "#";
+          link.className = "title";
+          link.id = `link-${store.properties.id}`;
+          link.innerHTML = `${store.properties.address}`;
 
-        new mapboxgl.Marker(el)
-          .setLngLat(feature.geometry.coordinates)
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 }) // add popups
-              .setHTML(
-                `<h3>${feature.properties.title}</h3><p>${feature.properties.description}</p>`
-              )
+          /* Add details to the individual listing. */
+          const details = listing.appendChild(document.createElement("div"));
+          details.innerHTML = `${store.properties.city}`;
+          if (store.properties.phone) {
+            details.innerHTML += ` &middot; ${store.properties.phoneFormatted}`;
+          }
+
+          /**
+           * Listen to the element and when it is clicked, do four things:
+           * 1. Update the `currentFeature` to the store associated with the clicked link
+           * 2. Fly to the point
+           * 3. Close all other popups and display popup for clicked store
+           * 4. Highlight listing in sidebar (and remove highlight for all other listings)
+           **/
+          link.addEventListener("click", function () {
+            for (const feature of stores.features) {
+              if (this.id === `link-${feature.properties.id}`) {
+                flyToStore(feature);
+                createPopUp(feature);
+              }
+            }
+            const activeItem = document.getElementsByClassName("active");
+            if (activeItem[0]) {
+              activeItem[0].classList.remove("active");
+            }
+            this.parentNode.classList.add("active");
+          });
+        }
+      }
+
+      /**
+       * Use Mapbox GL JS's `flyTo` to move the camera smoothly
+       * a given center point.
+       **/
+      function flyToStore(currentFeature) {
+        map.flyTo({
+          center: currentFeature.geometry.coordinates,
+          zoom: 15,
+        });
+      }
+
+      /**
+       * Create a Mapbox GL JS `Popup`.
+       **/
+      function createPopUp(currentFeature) {
+        const popUps = document.getElementsByClassName("mapboxgl-popup");
+        if (popUps[0]) popUps[0].remove();
+        const popup = new mapboxgl.Popup({ closeOnClick: false })
+          .setLngLat(currentFeature.geometry.coordinates)
+          .setHTML(
+            `<h3>Sweetgreen</h3><h4>${currentFeature.properties.address}</h4>`
           )
           .addTo(map);
       }
-
-      geojson.features.forEach(function (geojson, i) {
-        geojson.properties.id = i;
-      }); //Assign a unique ID to each location/marker
-
-
-
-      map.on("load", () => {
-        map.addLayer({
-          id: 'locations',
-          type: 'circle',
-          /* Add a GeoJSON source containing place coordinates and information. */
-          source: {
-            type: 'geojson',
-            data: geojson
-          }
-          // TODO: Here we want to load a layer
-          // TODO: Here we want to load/setup the popup
-        })
-        buildLocationList(geojson);
-        });
     });
   },
 };
@@ -129,22 +295,62 @@ export default {
   height: 100vh;
   position: relative;
 }
-.marker {
-  background-image: url("../assets/be_a_denist.png");
-  background-size: cover;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  cursor: pointer;
+
+body {
+  color: #404040;
+  font: 400 15px/22px "Source Sans Pro", "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-.mapboxgl-popup {
-  max-width: 200px;
+* {
+  box-sizing: border-box;
 }
 
-.mapboxgl-popup-content {
-  text-align: center;
-  font-family: "Open Sans", sans-serif;
+.sidebar {
+  position: absolute;
+  width: 33.3333%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  border-right: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.map {
+  position: absolute;
+  left: 33.3333%;
+  width: 66.6666%;
+  top: 0;
+  bottom: 0;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 400;
+  line-height: 20px;
+  padding: 20px 2px;
+}
+
+a {
+  color: #404040;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #101010;
+}
+
+.heading {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  min-height: 60px;
+  line-height: 60px;
+  padding: 0 10px;
+  background-color: #3a8cb3;
+  color: #fff;
 }
 
 .listings {
@@ -154,41 +360,96 @@ export default {
 }
 
 .listings .item {
+  display: block;
   border-bottom: 1px solid #eee;
   padding: 10px;
   text-decoration: none;
 }
 
-.listings .item:last-child { border-bottom: none; }
-
+.listings .item:last-child {
+  border-bottom: none;
+}
 .listings .item .title {
   display: block;
-  color: #00853e;
+  color: #3a8cb3;
   font-weight: 700;
 }
 
-.listings .item .title small { font-weight: 400; }
-
+.listings .item .title small {
+  font-weight: 400;
+}
 .listings .item.active .title,
-.listings .item .title:hover { color: #8cc63f; }
-
+.listings .item .title:hover {
+  color: #8cc63f;
+}
 .listings .item.active {
   background-color: #f8f8f8;
 }
-
 ::-webkit-scrollbar {
   width: 3px;
   height: 3px;
   border-left: 0;
   background: rgba(0, 0, 0, 0.1);
 }
-
 ::-webkit-scrollbar-track {
   background: none;
 }
-
 ::-webkit-scrollbar-thumb {
   background: #00853e;
   border-radius: 0;
+}
+
+.marker {
+  background-image: url("../assets/be_a_denist.png");
+  background-size: cover;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Marker tweaks */
+.mapboxgl-popup {
+  padding-bottom: 50px;
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
+}
+.mapboxgl-popup-content {
+  font: 400 15px/22px "Source Sans Pro", "Helvetica Neue", sans-serif;
+  padding: 0;
+  width: 180px;
+}
+.mapboxgl-popup-content h3 {
+  background: #91c949;
+  color: #fff;
+  margin: 0;
+  padding: 10px;
+  border-radius: 3px 3px 0 0;
+  font-weight: 700;
+  margin-top: -15px;
+}
+
+.mapboxgl-popup-content h4 {
+  margin: 0;
+  padding: 10px;
+  font-weight: 400;
+}
+
+.mapboxgl-popup-content div {
+  padding: 10px;
+}
+
+.mapboxgl-popup-anchor-top > .mapboxgl-popup-content {
+  margin-top: 15px;
+}
+
+.mapboxgl-popup-anchor-top > .mapboxgl-popup-tip {
+  border-bottom-color: #91c949;
+}
+.button {
+  display: flex;
+  margin: 30px 30px 30px 400px;
 }
 </style>
