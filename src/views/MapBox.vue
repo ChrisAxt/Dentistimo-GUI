@@ -14,89 +14,74 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { onMounted } from "vue";
 import mqtt from "mqtt";
 export default {
+  mounted() {
+    this.createConnection()
+  },
+  data() {
+      return {
+        connection: {
+          host: 'test.mosquitto.org',
+          port: 1883,
+          endpoint: '/mqtt',
+          clean: true, // Reserved session
+          connectTimeout: 4000, // Time out
+          reconnectPeriod: 4000, // Reconnection interval
+          // Certification Information
+        },
+        subscription: {
+          topic: 'topic/mqttx',
+          qos: 0,
+        },
+        publish: {
+          topic: 'topic/browser',
+          qos: 0,
+          payload: '{ "msg": "Hello, I am browser." }',
+        },
+        receiveNews: '',
+        qosList: [
+          { label: 0, value: 0 },
+          { label: 1, value: 1 },
+          { label: 2, value: 2 },
+        ],
+        client: {
+          connected: false,
+        },
+        subscribeSuccess: false,
+      }
+    },
+
+    methods: {
+      // Create connection
+      createConnection() {
+        // Connect string, and specify the connection method used through protocol
+        // ws unencrypted WebSocket connection
+        // wss encrypted WebSocket connection
+        // mqtt unencrypted TCP connection
+        // mqtts encrypted TCP connection
+        // wxs WeChat mini app connection
+        // alis Alipay mini app connection
+        const { host, port, endpoint, ...options } = this.connection
+        const connectUrl = `ws://${host}:${port}${endpoint}`
+        try {
+          this.client = mqtt.connect(connectUrl, options)
+        } catch (error) {
+          console.log('mqtt.connect error', error)
+        }
+        this.client.on('connect', () => {
+          console.log('Connection succeeded!')
+        })
+        this.client.on('error', error => {
+          console.log('Connection failed', error)
+        })
+        this.client.on('message', (topic, message) => {
+          this.receiveNews = this.receiveNews.concat(message)
+          console.log(`Received message ${message} from topic ${topic}`)
+        })
+      },
+  },
   name: "Mapbox",
   setup() {
     onMounted(() => {
-      const { host, port, endpoint } = {
-        host: "localhost",
-        port: 9001,
-        endpoint: "/mqtt",
-        clean: true, // Reserved session
-        connectTimeout: 4000, // Time out
-        reconnectPeriod: 4000, // Reconnection interval
-        // Certification Information
-        username: "emqx",
-        password: "public",
-      };
-
-      const connectUrl = `ws://localhost:9001`;
-      try {
-        const client = mqtt.connect(connectUrl, {
-          username: "emqx",
-          password: "public",
-        });
-        client.on("connect", () => {
-          console.log("Connection succeeded!");
-        });
-        client.on("error", (error) => {
-          console.log("Connection failed", error);
-        });
-        client.on("message", (topic, message) => {
-          // this.receiveNews = this.receiveNews.concat(message);
-          console.log(`Received message ${message} from topic ${topic}`);
-        });
-      } catch (error) {
-        console.log("mqtt.connect error", error);
-      }
-
-      // const connectUrl = `ws://127.0.0.1:9001`;
-      // let client = mqtt.connect(connectUrl, {
-      //   // clientId,
-      //   clean: true,
-      //   connectTimeout: 4000,
-      //   username: "emqx",
-      //   password: "public",
-      //   reconnectPeriod: 1000,
-      // });
-
-      // client.on('connect', () => {
-      //   console.log('Connection succeeded!')
-      // })
-      // client.on('error', error => {
-      //   console.log('Connection failed', error)
-      // })
-      // client.on('message', (topic, message) => {
-      //   this.receiveNews = this.receiveNews.concat(message)
-      //   console.log(`Received message ${message} from topic ${topic}`)
-      // })
-      // const client = mqtt.connect("ws://localhost:8080");
-      // client.on("connect", () => {
-      //   console.log("Connection succeeded!");
-      // });
-      // client.on("error", (error) => {
-      //   console.log("Connection failed", error);
-      // });
-      // client.on("message", (topic, message) => {
-      //   // this.receiveNews = this.receiveNews.concat(message)
-      //   console.log(`Received message ${message} from topic ${topic}`);
-      // });
-      // console.log(client);
-      // client.on("connect", function (data) {
-      //   console.log(data);
-      //   client.subscribe("stored_new_clinic", function (err) {
-      //     console.log(err);
-      //     if (!err) {
-      //       client.publish("stored_new_clinic", "Hello mqtt");
-      //     }
-      //   });
-      // });
-
-      // client.on("message", function (topic, message) {
-      //   // message is Buffer
-      //   console.log(message.toString());
-      //   client.end();
-      // });
-
       mapboxgl.accessToken =
         "pk.eyJ1Ijoib2xnYXJhdHUiLCJhIjoiY2t3YzhrdWQ3MXZlbDJwcGF3ZmsyYXp3YSJ9.UILiP1r9n3yZ7MbHuW-ovQ";
 
