@@ -1,11 +1,15 @@
 <template>
-  <div class='sidebar'>
-    <div class='heading'>
-        <h1>Dentist locations</h1>
+  <div class="sidebar">
+    <div class="heading">
+      <h1>Dentist locations</h1>
     </div>
-    <div id='listings' class='listings'></div>
-</div>
-<div id="map" class="map"></div>
+    <div id="listings" class="listings">
+      <p class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
+        {{ dentist.name }}
+      </p>
+    </div>
+  </div>
+  <div id="map" class="map"></div>
   <div id="app"></div>
 </template>
 
@@ -16,30 +20,46 @@ import { onMounted } from "vue";
 import mqtt from "mqtt";
 export default {
   mounted() {
-    this.createConnection()
+    this.createMap();
+    this.createConnection();
   },
   data() {
     return {
       connection: {
-        host: '127.0.0.1',
+        host: "127.0.0.1",
         port: 9001,
-        endpoint: '/mqtt',
+        endpoint: "/mqtt",
         clean: true, // Reserved session
         // Certification Information
-        clientId: 'Dentistimo Team5 - Client n°' + Math.random().toString(16).substr(2, 8)
+        clientId:
+          "Dentistimo Team5 - Client n°" +
+          Math.random().toString(16).substr(2, 8),
       },
       qosList: [
-        {label: 0, value: 0},
-        {label: 1, value: 1},
-        {label: 2, value: 2},
+        { label: 0, value: 0 },
+        { label: 1, value: 1 },
+        { label: 2, value: 2 },
       ],
       client: {
         connected: false,
       },
       subscribeSuccess: false,
-    }
+      map: {},
+      dentists: [],
+    };
   },
   methods: {
+    binArrayToJson(binArray) {
+      var str = "";
+      for (var i = 0; i < binArray.length; i++) {
+        str += String.fromCharCode(parseInt(binArray[i]));
+      }
+      return JSON.parse(str);
+    },
+    getAllClinics() {
+      // TODO: Fetch JSON data from storedClinics topic
+      // TODO: Convert JSON to GeoJSON
+    },
     // Create connection
     createConnection() {
       // Connect string, and specify the connection method used through protocol
@@ -49,28 +69,49 @@ export default {
       // mqtts encrypted TCP connection
       // wxs WeChat mini app connection
       // alis Alipay mini app connection
-      const {host, port, endpoint, ...options} = this.connection
-      const connectUrl = `ws://${host}:${port}${endpoint}`
+      const { host, port, endpoint, ...options } = this.connection;
+      const connectUrl = `ws://${host}:${port}${endpoint}`;
       try {
-        this.client = mqtt.connect(connectUrl, options)
+        this.client = mqtt.connect(connectUrl, options);
       } catch (error) {
-        console.log('mqtt.connect error', error)
+        console.log("mqtt.connect error", error);
       }
-      this.client.on('connect', () => {
-        console.log('Connection succeeded!')
-        //this.client.subscribe() //TODO: Define which topics to subscribe to for this page
-      })
-      this.client.on('error', error => {
-        console.log('Connection failed', error)
-      })
-      this.client.on('message', (topic, message) => {
+      this.client.on("connect", () => {
+        console.log("Connection succeeded!");
+        this.client.subscribe("stored_new_clinic", function (err) {
+          if (err) {
+            console.error(err);
+          }
+        }); //TODO: Define which topics to subscribe to for this page
+      });
+      this.client.on("error", (error) => {
+        console.log("Connection failed", error);
+      });
+      this.client.on("message", (topic, message) => {
+        if (topic === "stored_new_clinic") {
+          const dentist = this.binArrayToJson(message);
+          this.dentists.push(dentist);
+          this.addMarker(dentist);
+        }
         //TODO: Describe reaction to message here: process data and store it into an object in data()
-      })
-    }
-  },
-  name: "Mapbox",
-  setup() {
-    onMounted(() => {
+      });
+    },
+    addMarker(dentist) {
+      const el = document.createElement("div");
+      el.className = "marker";
+      new mapboxgl.Marker(el)
+        .setLngLat([dentist.coordinate.longitude, dentist.coordinate.latitude])
+        .setPopup(
+          new mapboxgl.Popup({ offset: 25 }) // add popups
+            .setHTML(
+              `<h3>${dentist.name}</h3><p>${dentist.address}</p><form action="./booking">
+    <input type="submit" value="Book" />
+</form>`
+            )
+        )
+        .addTo(this.map);
+    },
+    createMap() {
       mapboxgl.accessToken =
         "pk.eyJ1Ijoib2xnYXJhdHUiLCJhIjoiY2t3YzhrdWQ3MXZlbDJwcGF3ZmsyYXp3YSJ9.UILiP1r9n3yZ7MbHuW-ovQ";
       const map = new mapboxgl.Map({
@@ -79,122 +120,70 @@ export default {
         center: [11.97456, 57.70887],
         zoom: 12.5,
       });
+      this.map = map;
       const geojson = {
         type: "FeatureCollection",
-        features: [
-          {
-            type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: [11.969388, 57.707619],
-            },
-            properties: {
-              title: "Your Dentist",
-              description: "Spannmålsgatan 20  ",
-
-            },
-          },
-          {
-            type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: [11.940386, 57.709872]
-            },
-            properties: {
-              title: "The Crown",
-              description: "Lindholmsallén 19",
-
-            }
-          }
-        ],
+        features: [],
       };
       function buildLocationList(geojson) {
         for (const geojson of geojson.features) {
           /* Add a new listing section to the sidebar. */
-          const listings = document.getElementById('listings');
-          const listing = listings.appendChild(document.createElement('div'));
+          const listings = document.getElementById("listings");
+          const listing = listings.appendChild(document.createElement("div"));
           /* Assign a unique `id` to the listing. */
           listing.id = `listing-${geojson.properties.id}`;
           /* Assign the `item` class to each listing for styling. */
-          listing.className = 'item';
+          listing.className = "item";
 
           /* Add the link to the individual listing created above. */
-          const link = listing.appendChild(document.createElement('a'));
-          link.href = '#';
-          link.className = 'title';
+          const link = listing.appendChild(document.createElement("a"));
+          link.href = "#";
+          link.className = "title";
           link.id = `link-${geojson.properties.id}`;
           link.innerHTML = `${geojson.properties.title}`;
 
           /* Add details to the individual listing. */
-          const details = listing.appendChild(document.createElement('div'));
+          const details = listing.appendChild(document.createElement("div"));
           details.innerHTML = `${geojson.properties.description}`;
           if (geojson.properties.phone) {
             details.innerHTML += ` · ${geojson.properties.phoneFormatted}`;
           }
           if (geojson.properties.distance) {
-            const roundedDistance = Math.round(geojson.properties.distance * 100) / 100;
+            const roundedDistance =
+              Math.round(geojson.properties.distance * 100) / 100;
             details.innerHTML += `<div><strong>${roundedDistance} miles away</strong></div>`;
           }
         }
       }
 
-      // add markers to map
-      for (const feature of geojson.features) {
-        // create a HTML element for each feature
-        const el = document.createElement("div");
-        el.className = "marker";
-
-        // make a marker for each feature and add to the map
-        //   new mapboxgl.Marker(el)
-        //     .setLngLat(feature.geometry.coordinates)
-        //     .addTo(map);
-        // }
-
-        new mapboxgl.Marker(el)
-          .setLngLat(feature.geometry.coordinates)
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 }) // add popups
-              .setHTML(
-                `<h3>${feature.properties.title}</h3><p>${feature.properties.description}</p><form action="./booking">
-    <input type="submit" value="Book" />
-</form>`
-              )
-          )
-          .addTo(map);
-      }
 
       geojson.features.forEach(function (geojson, i) {
         geojson.properties.id = i;
       }); //Assign a unique ID to each location/marker
-
+      map.on("");
       map.on("load", () => {
         map.addLayer({
-          id: 'locations',
-          type: 'circle',
+          id: "locations",
+          type: "circle",
           /* Add a GeoJSON source containing place coordinates and information. */
           source: {
-            type: 'geojson',
-            data: geojson
-          }
+            type: "geojson",
+            data: geojson,
+          },
           // TODO: Here we want to load a layer
           // TODO: Here we want to load/setup the popup
-        })
-        buildLocationList(geojson);
         });
-    });
+        buildLocationList(geojson);
+      });
+    },
   },
-  methods:{
-    getAllClinics(){
-    // TODO: Fetch JSON data from storedClinics topic
-    // TODO: Convert JSON to GeoJSON
-    }
-  }
+  name: "Mapbox",
 };
 </script>
 
 <style>
-.button{
-  background-color: blue
+.button {
+  background-color: blue;
 }
 #map {
   height: 100vh;
@@ -230,7 +219,9 @@ export default {
   text-decoration: none;
 }
 
-.listings .item:last-child { border-bottom: none; }
+.listings .item:last-child {
+  border-bottom: none;
+}
 
 .listings .item .title {
   display: block;
@@ -238,10 +229,14 @@ export default {
   font-weight: 700;
 }
 
-.listings .item .title small { font-weight: 400; }
+.listings .item .title small {
+  font-weight: 400;
+}
 
 .listings .item.active .title,
-.listings .item .title:hover { color: #8cc63f; }
+.listings .item .title:hover {
+  color: #8cc63f;
+}
 
 .listings .item.active {
   background-color: #f8f8f8;
@@ -268,7 +263,7 @@ export default {
 
 body {
   color: #404040;
-  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', sans-serif;
+  font: 400 15px/22px "Source Sans Pro", "Helvetica Neue", sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
