@@ -18,6 +18,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { onMounted } from "vue";
 import mqtt from "mqtt";
+
 export default {
   mounted() {
     this.createMap();
@@ -56,19 +57,9 @@ export default {
       }
       return JSON.parse(str);
     },
-    getAllClinics() {
-      // TODO: Fetch JSON data from storedClinics topic
-      // TODO: Convert JSON to GeoJSON
-    },
     // Create connection
     createConnection() {
       // Connect string, and specify the connection method used through protocol
-      // ws unencrypted WebSocket connection
-      // wss encrypted WebSocket connection
-      // mqtt unencrypted TCP connection
-      // mqtts encrypted TCP connection
-      // wxs WeChat mini app connection
-      // alis Alipay mini app connection
       const { host, port, endpoint, ...options } = this.connection;
       const connectUrl = `ws://${host}:${port}${endpoint}`;
       try {
@@ -87,6 +78,7 @@ export default {
       this.client.on("error", (error) => {
         console.log("Connection failed", error);
       });
+      // Subscribes to clinic handler
       this.client.on("message", (topic, message) => {
         if (topic === "stored_new_clinic") {
           const dentist = this.binArrayToJson(message);
@@ -105,8 +97,8 @@ export default {
           new mapboxgl.Popup({ offset: 25 }) // add popups
             .setHTML(
               `<h3>${dentist.name}</h3><p>${dentist.address}</p><form action="./booking">
-    <input type="submit" value="Book" />
-</form>`
+              <input type="submit" value="Book" />
+              </form>`
             )
         )
         .addTo(this.map);
@@ -155,8 +147,6 @@ export default {
           }
         }
       }
-
-
       geojson.features.forEach(function (geojson, i) {
         geojson.properties.id = i;
       }); //Assign a unique ID to each location/marker
