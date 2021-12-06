@@ -113,8 +113,6 @@ export default {
         geojson.properties.id = i;
       }); //Assign a unique ID to each location/marker
 
-
-
       map.on("load", () => {
         map.addLayer({
           id: 'locations',
@@ -131,6 +129,12 @@ export default {
         });
     });
   },
+  methods:{
+    getAllClinics(){
+    // TODO: Fetch JSON data from storedClinics topic
+    // TODO: Convert JSON to GeoJSON
+    }
+  }
 };
 </script>
 
