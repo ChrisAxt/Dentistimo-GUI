@@ -11,6 +11,7 @@
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
     "mapbox-gl": "^2.6.1",
+    "mqtt": "^4.2.8",
     "vue": "^3.2.22",
     "vue-mapbox": "^0.4.1",
     "vue-router": "^4.0.0-0",
