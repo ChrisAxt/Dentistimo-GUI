@@ -96,7 +96,8 @@ export default {
         .setPopup(
           new mapboxgl.Popup({ offset: 25 }) // add popups
             .setHTML(
-              `<h3>${dentist.name}</h3><p>${dentist.address}</p><form action="./booking">
+              `<h3>${dentist.name}</h3><div>${dentist.address}</div>
+              <form action="./booking">
               <input type="submit" value="Book" />
               </form>`
             )
@@ -207,6 +208,8 @@ export default {
   border-bottom: 1px solid #eee;
   padding: 10px;
   text-decoration: none;
+  color: #16653a;
+  font-weight: bold;
 }
 
 .listings .item:last-child {
