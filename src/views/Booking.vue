@@ -13,7 +13,7 @@
     <label for="time">Time: &nbsp;
   <input type="time" id="start" name="trip-start"
          value="2018-07-22"
-         min="2018-01-01" max="2018-12-31"> 
+         min="2018-01-01" max="2018-12-31">
          </label></div>
       <div class="userInput">
 <label for="fname">First name:</label><br>
@@ -30,6 +30,64 @@
 </template>
 
 <script>
+import mqtt from "mqtt"
+
+export default {
+  mounted() {
+    console.log('mounted')
+    this.createConnection()
+  },
+  data() {
+    return {
+      connection: {
+        host: '127.0.0.1',
+        port: 9001,
+        endpoint: '/mqtt',
+        clean: true, // Reserved session
+        // Certification Information
+        clientId: 'Dentistimo Team5 - Client n°' + Math.random().toString(16).substr(2, 8)
+      },
+      qosList: [
+        {label: 0, value: 0},
+        {label: 1, value: 1},
+        {label: 2, value: 2},
+      ],
+      client: {
+        connected: false,
+      },
+      subscribeSuccess: false,
+    }
+  },
+  methods: {
+    // Create connection
+    createConnection() {
+      // Connect string, and specify the connection method used through protocol
+      // ws unencrypted WebSocket connection
+      // wss encrypted WebSocket connection
+      // mqtt unencrypted TCP connection
+      // mqtts encrypted TCP connection
+      // wxs WeChat mini app connection
+      // alis Alipay mini app connection
+      const {host, port, endpoint, ...options} = this.connection
+      const connectUrl = `ws://${host}:${port}${endpoint}`
+      try {
+        this.client = mqtt.connect(connectUrl, options)
+      } catch (error) {
+        console.log('mqtt.connect error', error)
+      }
+      this.client.on('connect', () => {
+        console.log('Connection succeeded!')
+        //this.client.subscribe() //TODO: Define which topics to subscribe to for this page
+      })
+      this.client.on('error', error => {
+        console.log('Connection failed', error)
+      })
+      this.client.on('message', (topic, message) => {
+        //TODO: Describe reaction to message here: process data and store it into an object in data()
+      })
+    }
+  }
+}
 </script>
 
 <style>
