@@ -23,6 +23,7 @@ export default {
   mounted() {
     this.createMap();
     this.createConnection();
+    this.getAllDentists();
   },
   data() {
     return {
@@ -167,7 +168,11 @@ export default {
         buildLocationList(geojson);
       });
     },
+    getAllDentists() {
+      this.client.publish("get_all_clinics");
+    },
   },
+
   name: "Mapbox",
 };
 </script>
