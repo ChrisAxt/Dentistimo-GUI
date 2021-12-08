@@ -6,10 +6,13 @@
     <div id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
-        <p class="address"> Address: {{dentist.address}} </p>
-        <p> Monday: {{ dentist.openinghours.monday}} Tuesday: {{ dentist.openinghours.tuesday}}
-          Wednesday: {{ dentist.openinghours.wednesday}} Thursday: {{ dentist.openinghours.thursday}}
-          Friday: {{ dentist.openinghours.friday}}
+        <p class="address">Address: {{ dentist.address }}</p>
+        <p>
+          Monday: {{ dentist.openinghours.monday }} Tuesday:
+          {{ dentist.openinghours.tuesday }} Wednesday:
+          {{ dentist.openinghours.wednesday }} Thursday:
+          {{ dentist.openinghours.thursday }} Friday:
+          {{ dentist.openinghours.friday }}
         </p>
       </div>
     </div>
@@ -124,66 +127,27 @@ export default {
         type: "FeatureCollection",
         features: [],
       };
-      function buildLocationList(geojson) {
-        for (const geojson of geojson.features) {
-          /* Add a new listing section to the sidebar. */
-          const listings = document.getElementById("listings");
-          const listing = listings.appendChild(document.createElement("div"));
-          /* Assign a unique `id` to the listing. */
-          listing.id = `listing-${geojson.properties.id}`;
-          /* Assign the `item` class to each listing for styling. */
-          listing.className = "item";
-
-          /* Add the link to the individual listing created above. */
-          const link = listing.appendChild(document.createElement("a"));
-          link.href = "#";
-          link.className = "title";
-          link.id = `link-${geojson.properties.id}`;
-          link.innerHTML = `${geojson.properties.title}`;
-
-          /* Add details to the individual listing. */
-          const details = listing.appendChild(document.createElement("div"));
-          details.innerHTML = `${geojson.properties.description}`;
-          if (geojson.properties.phone) {
-            details.innerHTML += ` · ${geojson.properties.phoneFormatted}`;
-          }
-          if (geojson.properties.distance) {
-            const roundedDistance =
-              Math.round(geojson.properties.distance * 100) / 100;
-            details.innerHTML += `<div><strong>${roundedDistance} miles away</strong></div>`;
-          }
-        }
-      }
-      geojson.features.forEach(function (geojson, i) {
-        geojson.properties.id = i;
-      }); //Assign a unique ID to each location/marker
       map.on("");
       map.on("load", () => {
         map.addLayer({
           id: "locations",
           type: "circle",
-          /* Add a GeoJSON source containing place coordinates and information. */
           source: {
             type: "geojson",
             data: geojson,
           },
-          // TODO: Here we want to load a layer
-          // TODO: Here we want to load/setup the popup
         });
-        buildLocationList(geojson);
       });
     },
     getAllDentists() {
       this.client.publish("get_all_clinics");
     },
   },
-
   name: "Mapbox",
 };
 </script>
 
 <style>
-
 p {
   font-size: small;
   font-weight: lighter;
