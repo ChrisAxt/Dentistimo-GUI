@@ -4,9 +4,14 @@
       <h1>Dentist locations</h1>
     </div>
     <div id="listings" class="listings">
-      <p class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
+      <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
-      </p>
+        <p class="address"> Address: {{dentist.address}} </p>
+        <p> Monday: {{ dentist.openinghours.monday}} Tuesday: {{ dentist.openinghours.tuesday}}
+          Wednesday: {{ dentist.openinghours.wednesday}} Thursday: {{ dentist.openinghours.thursday}}
+          Friday: {{ dentist.openinghours.friday}}
+        </p>
+      </div>
     </div>
   </div>
   <div id="map" class="map"></div>
@@ -99,7 +104,7 @@ export default {
             .setHTML(
               `<h3>${dentist.name}</h3><div>${dentist.address}</div>
               <form action="./booking">
-              <input type="submit" value="Book" />
+              <input type="submit" value="Book" color="blue"/>
               </form>`
             )
         )
@@ -178,6 +183,20 @@ export default {
 </script>
 
 <style>
+
+p {
+  font-size: small;
+  font-weight: lighter;
+  position: relative;
+  right: 350px;
+}
+
+p.address {
+  font-size: medium;
+  font-weight: normal;
+  white-space: nowrap;
+}
+
 .button {
   background-color: blue;
 }
@@ -215,6 +234,7 @@ export default {
   text-decoration: none;
   color: #16653a;
   font-weight: bold;
+  font-size: large;
 }
 
 .listings .item:last-child {
