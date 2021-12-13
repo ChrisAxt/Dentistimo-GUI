@@ -1,6 +1,10 @@
-# Team 5 Frontend
+# Frontend
 
-This is the frontend of the DENTISTIMO project.
+## Description
+
+This is the frontend part of the distributed system DENTISTIMO, a web application that offers a geolocalisation based dental care booking system.
+Dentistimo GUI provides a graphical user interface of the system using dentistry data from the clinic handler component. More details can be found below in this README.md file.
+
 
 Responsibilities:
 
