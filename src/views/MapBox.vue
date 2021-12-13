@@ -8,11 +8,11 @@
         {{ dentist.name }}
         <p class="address">Address: {{ dentist.address }}</p>
         <p>
-          Monday: {{ dentist.openinghours.monday }} Tuesday:
-          {{ dentist.openinghours.tuesday }} Wednesday:
-          {{ dentist.openinghours.wednesday }} Thursday:
-          {{ dentist.openinghours.thursday }} Friday:
-          {{ dentist.openinghours.friday }}
+          Monday: {{ dentist.openinghours.monday }}
+          Tuesday: {{ dentist.openinghours.tuesday }}
+          Wednesday: {{ dentist.openinghours.wednesday }}
+          Thursday: {{ dentist.openinghours.thursday }}
+          Friday: {{ dentist.openinghours.friday }}
         </p>
       </div>
     </div>
@@ -24,7 +24,6 @@
 <script>
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { onMounted } from "vue";
 import mqtt from "mqtt";
 
 export default {
@@ -59,6 +58,9 @@ export default {
     };
   },
   methods: {
+
+    // Parsing the received binary array to JSON objects //
+
     binArrayToJson(binArray) {
       var str = "";
       for (var i = 0; i < binArray.length; i++) {
@@ -66,9 +68,13 @@ export default {
       }
       return JSON.parse(str);
     },
-    // Create connection
+
+    // Create mqtt connection //
+
     createConnection() {
-      // Connect string, and specify the connection method used through protocol
+
+      // Connect string, and specify the connection method used through protocol //
+
       const { host, port, endpoint, ...options } = this.connection;
       const connectUrl = `ws://${host}:${port}${endpoint}`;
       try {
@@ -87,7 +93,9 @@ export default {
       this.client.on("error", (error) => {
         console.log("Connection failed", error);
       });
-      // Subscribes to clinic handler
+
+      // Subscribes to clinic handler //
+
       this.client.on("message", (topic, message) => {
         if (topic === "stored_new_clinic") {
           const dentist = this.binArrayToJson(message);
@@ -97,6 +105,9 @@ export default {
         //TODO: Describe reaction to message here: process data and store it into an object in data()
       });
     },
+
+    // Adds markers on the map and popups to the markers //
+
     addMarker(dentist) {
       const el = document.createElement("div");
       el.className = "marker";
@@ -113,6 +124,9 @@ export default {
         )
         .addTo(this.map);
     },
+
+    // Creates the map object on the page //
+
     createMap() {
       mapboxgl.accessToken =
         "pk.eyJ1Ijoib2xnYXJhdHUiLCJhIjoiY2t3YzhrdWQ3MXZlbDJwcGF3ZmsyYXp3YSJ9.UILiP1r9n3yZ7MbHuW-ovQ";
@@ -268,8 +282,6 @@ a:hover {
   color: #101010;
 }
 
-/* The page is split between map and sidebar - the sidebar gets 1/3, map
-gets 2/3 of the page. You can adjust this to your personal liking. */
 .sidebar {
   position: absolute;
   width: 33.3333%;
