@@ -9,6 +9,10 @@ Responsibilities:
 - Allow user to book an appointment 
 - Publish booking (date + time) to MQTT broker 
 
+## Data Input 
+
+The client subscribes to a topic in the clinic handler and expects to recieve dentist data via MQTT.   
+This data is then displayed on the map in line with the requirements. 
 
 
 ## Project setup
