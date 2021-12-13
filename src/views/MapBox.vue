@@ -68,7 +68,8 @@ export default {
       }
       return JSON.parse(str);
     },
-    // Create connection
+
+    // Create mqtt connection //
 
     createConnection() {
 
