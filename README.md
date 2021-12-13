@@ -11,7 +11,8 @@ Responsibilities:
 
 ## Data Input 
 
-The client subscribes to a topic in the clinic handler and expects to recieve dentist data via MQTT. 
+The client subscribes to a topic in the clinic handler and expects to recieve dentist data via MQTT.   
+This data is then displayed on the map in line with the requirements. 
 
 
 ## Project setup
