@@ -17,11 +17,14 @@ Dentistimo GUI provides a graphical user interface of the system using dentistry
 - Allow user to book an appointment 
 - Publish booking (date + time) to MQTT broker 
 
-## Data Input 
+## Data Input and Output
 
-The client subscribes to a topic in the clinic handler and expects to recieve dentist data via MQTT.   
-This data is then displayed on the map in line with the requirements. 
+#### Data Input
 
+- The client subscribes to a topic in the clinic handler and expects to recieve dentist data via MQTT.  This data is then displayed on the map in line with the requirements. 
+
+#### Data Output
+- The client publishes a request for data every time the page reloads, which is subscribed by the clinic handler. 
 
 ## Project setup
 ```
