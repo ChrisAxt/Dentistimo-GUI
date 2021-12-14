@@ -7,7 +7,7 @@ Dentistimo GUI provides a graphical user interface of the system using dentistry
 
 ## System Architecture - Component Diagram
 
-> ![Component Diagram](Assets/System_Component_Diagram_v2.0.png)
+![System_Component_Diagram_v2.0__1_](/uploads/45a7fa0c8ac9aeace2ea507ccfce552b/System_Component_Diagram_v2.0__1_.png)
 
 
 ## Components Responsibilities
