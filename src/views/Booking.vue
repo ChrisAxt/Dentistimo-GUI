@@ -7,25 +7,25 @@
 <div style="height:280px; width: 700px; position: center;">
   <div class="days">
   <div class="day">
-    <div class="datelabel"><strong>Monday</strong><br/>August 23</div>
+    <div class="datelabel"><strong>Monday</strong><br/>December 13</div>
     <div class="timeslot">9:00am</div>
     <div class="timeslot">9:30am</div>
     <div class="timeslot">10:00am</div>
   </div>
   <div class="day">
-    <div class="datelabel"><strong>Tuesday</strong><br/>August 24</div>
+    <div class="datelabel"><strong>Tuesday</strong><br/>December 14</div>
     <div class="timeslot">10:30pm</div>
   </div>  
   <div class="day">
-    <div class="datelabel"><strong>Wednesday</strong><br/>August 25</div>
+    <div class="datelabel"><strong>Wednesday</strong><br/>December 15</div>
     <div class="timeslot">10:30pm</div>
   </div>
   <div class="day">
-    <div class="datelabel"><strong>Thursday</strong><br/>August 26</div>
+    <div class="datelabel"><strong>Thursday</strong><br/>December 16</div>
     <div class="timeslot">10:30pm</div>
   </div>
   <div class="day">
-    <div class="datelabel"><strong>Friday</strong><br/>August 27</div>
+    <div class="datelabel"><strong>Friday</strong><br/>December 17</div>
     <div class="timeslot">10:30pm</div>
   </div>
   </div>
@@ -185,7 +185,7 @@ p {
 .day {
   width: 120px;
   height: 230px;
-  background-color: #efeff6;
+  background-color: #f4f7ff;
   padding:10px;
   float:left;
   margin-right:7px;
@@ -194,13 +194,15 @@ p {
 
 .datelabel {
   margin-bottom: 15px;
+  color: rgb(77, 72, 72);
 }
 
 .timeslot {
-  background-color: #00c09d;
+  background-color: #d5e7ff;
   width: auto;
   height: 30px;
-  color: white;
+  color: rgb(49, 88, 138);
+  font-weight: 500;
   padding:7px;
   margin-top: 5px;
   font-size: 14px;
@@ -210,7 +212,7 @@ p {
 }
 
 .timeslot:hover { 
-  background-color: #2CA893;
+  background-color: #3d83d3;
   cursor: pointer;
 }
 </style>
