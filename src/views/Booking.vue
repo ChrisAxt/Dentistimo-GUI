@@ -34,7 +34,6 @@ import mqtt from "mqtt"
 
 export default {
   mounted() {
-    console.log('mounted')
     this.createConnection()
   },
   data() {
@@ -56,6 +55,11 @@ export default {
         connected: false,
       },
       subscribeSuccess: false,
+      subscriptionTopics: [
+        'Team5/Dentistimo/Booking/Create/Success',
+        'Team5/Dentistimo/Booking/Create/Fail'
+          //TODO: add here all topics to subscribe to
+      ]
     }
   },
   methods: {
@@ -77,14 +81,30 @@ export default {
       }
       this.client.on('connect', () => {
         console.log('Connection succeeded!')
-        //this.client.subscribe() //TODO: Define which topics to subscribe to for this page
+        this.client.subscribe(this.subscriptionTopics)
       })
       this.client.on('error', error => {
         console.log('Connection failed', error)
       })
       this.client.on('message', (topic, message) => {
         //TODO: Describe reaction to message here: process data and store it into an object in data()
+
+        switch (topic){
+          case 'Team5/Dentistimo/Booking/Create/Success':
+            this.notifySuccess(message)
+                break;
+            case 'Team5/Dentistimo/Booking/Create/Fail':
+              this.notifyFailure(message)
+        }
       })
+    },
+    notifySuccess(message){
+      let newBooking = JSON.parse(message)
+      alert('You have a new appointment at the clinic ' + newBooking.clinic.name + ' on the ' + newBooking.date + ' at ' + newBooking.startTime)
+    },
+    notifyFailure(message){
+      let error = JSON.parse(message)
+      alert('Something went wrong. Please contact the administrator. \n'+ 'Error message: ' + error.error )
     }
   }
 }
