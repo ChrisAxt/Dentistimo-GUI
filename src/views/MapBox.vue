@@ -8,11 +8,11 @@
         {{ dentist.name }}
         <p class="address">Address: {{ dentist.address }}</p>
         <p>
-          Monday: {{ dentist.openinghours.monday }}
-          Tuesday: {{ dentist.openinghours.tuesday }}
-          Wednesday: {{ dentist.openinghours.wednesday }}
-          Thursday: {{ dentist.openinghours.thursday }}
-          Friday: {{ dentist.openinghours.friday }}
+          Monday: {{ dentist.openinghours.monday }} Tuesday:
+          {{ dentist.openinghours.tuesday }} Wednesday:
+          {{ dentist.openinghours.wednesday }} Thursday:
+          {{ dentist.openinghours.thursday }} Friday:
+          {{ dentist.openinghours.friday }}
         </p>
       </div>
     </div>
@@ -58,23 +58,15 @@ export default {
     };
   },
   methods: {
-
     // Parsing the received binary array to JSON objects //
-
-    binArrayToJson(binArray) {
-      var str = "";
-      for (var i = 0; i < binArray.length; i++) {
-        str += String.fromCharCode(parseInt(binArray[i]));
-      }
-      return JSON.parse(str);
+    decodeBinArray(binArray) {
+      let utf8decoder = new TextDecoder("utf8");
+      return JSON.parse(utf8decoder.decode(binArray));
     },
 
     // Create mqtt connection //
-
     createConnection() {
-
       // Connect string, and specify the connection method used through protocol //
-
       const { host, port, endpoint, ...options } = this.connection;
       const connectUrl = `ws://${host}:${port}${endpoint}`;
       try {
@@ -98,7 +90,7 @@ export default {
 
       this.client.on("message", (topic, message) => {
         if (topic === "stored_new_clinic") {
-          const dentist = this.binArrayToJson(message);
+          const dentist = this.decodeBinArray(message);
           this.dentists.push(dentist);
           this.addMarker(dentist);
         }
