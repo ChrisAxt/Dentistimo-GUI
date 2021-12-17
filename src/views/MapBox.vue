@@ -63,7 +63,10 @@ export default {
       let utf8decoder = new TextDecoder("utf8");
       return JSON.parse(utf8decoder.decode(binArray));
     },
-
+    goToBooking(dentist){
+      console.log(dentist)
+      //TODO: Change this method to store dentist in local storage and go to booking page
+    },
     // Create mqtt connection //
     createConnection() {
       // Connect string, and specify the connection method used through protocol //
@@ -99,14 +102,47 @@ export default {
     },
 
     // Adds markers on the map and popups to the markers //
-
     addMarker(dentist) {
+      //Creates a div and set the class name of that div for the marker
       const el = document.createElement("div");
       el.className = "marker";
-      new mapboxgl.Marker(el)
+
+      //Creates a parent div for the popup content
+      const popupContent = document.createElement("div")
+
+      //Creates a div for popup info and sets the html to display dentist info
+      const popupInfo = document.createElement("div")
+      popupInfo.innerHTML = `<h3>${dentist.name}</h3><div>${dentist.address}</div>`
+
+      //Creates a div with a book button
+      const bookingButton = document.createElement("div")
+      bookingButton.innerHTML = `<button>Book</button>`
+
+      //Adds a listener to the button calling a method
+      bookingButton.addEventListener('click', (e) => {
+        this.goToBooking(dentist)
+      })
+
+      //Add the popup info as a child of the popup content div
+      popupContent.appendChild(popupInfo)
+      //Add the booking button as a child of the popup content div
+      popupContent.appendChild(bookingButton)
+
+      //Creates a marker
+      const marker = new mapboxgl.Marker(el)
+
+      //Creates a popup
+      const popup = new mapboxgl.Popup({ offset: 25 })
+      popup.setDOMContent(popupContent) // sets the popup dom as the one defined in the popup content
+
+      marker.setLngLat([dentist.coordinate.longitude, dentist.coordinate.latitude])
+      marker.setPopup(popup)
+      marker.addTo(this.map)
+
+      /*new mapboxgl.Marker(el)
         .setLngLat([dentist.coordinate.longitude, dentist.coordinate.latitude])
         .setPopup(
-          new mapboxgl.Popup({ offset: 25 }) // add popups
+          popup // add popups
             .setHTML(
               `<h3>${dentist.name}</h3><div>${dentist.address}</div>
               <form action="./booking">
@@ -114,7 +150,8 @@ export default {
               </form>`
             )
         )
-        .addTo(this.map);
+        .addTo(this.map);*/
+
     },
 
     // Creates the map object on the page //
