@@ -6,10 +6,13 @@
     <div id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
-        <p class="address"> Address: {{dentist.address}} </p>
-        <p> Monday: {{ dentist.openinghours.monday}} Tuesday: {{ dentist.openinghours.tuesday}}
-          Wednesday: {{ dentist.openinghours.wednesday}} Thursday: {{ dentist.openinghours.thursday}}
-          Friday: {{ dentist.openinghours.friday}}
+        <p class="address">Address: {{ dentist.address }}</p>
+        <p>
+          Monday: {{ dentist.openinghours.monday }} Tuesday:
+          {{ dentist.openinghours.tuesday }} Wednesday:
+          {{ dentist.openinghours.wednesday }} Thursday:
+          {{ dentist.openinghours.thursday }} Friday:
+          {{ dentist.openinghours.friday }}
         </p>
       </div>
     </div>
@@ -21,7 +24,6 @@
 <script>
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { onMounted } from "vue";
 import mqtt from "mqtt";
 
 export default {
@@ -56,16 +58,18 @@ export default {
     };
   },
   methods: {
-    binArrayToJson(binArray) {
-      var str = "";
-      for (var i = 0; i < binArray.length; i++) {
-        str += String.fromCharCode(parseInt(binArray[i]));
-      }
-      return JSON.parse(str);
+    // Parsing the received binary array to JSON objects //
+    decodeBinArray(binArray) {
+      let utf8decoder = new TextDecoder("utf8");
+      return JSON.parse(utf8decoder.decode(binArray));
     },
-    // Create connection
+    goToBooking(dentist){
+      console.log(dentist)
+      //TODO: Change this method to store dentist in local storage and go to booking page
+    },
+    // Create mqtt connection //
     createConnection() {
-      // Connect string, and specify the connection method used through protocol
+      // Connect string, and specify the connection method used through protocol //
       const { host, port, endpoint, ...options } = this.connection;
       const connectUrl = `ws://${host}:${port}${endpoint}`;
       try {
@@ -84,23 +88,61 @@ export default {
       this.client.on("error", (error) => {
         console.log("Connection failed", error);
       });
-      // Subscribes to clinic handler
+
+      // Subscribes to clinic handler //
+
       this.client.on("message", (topic, message) => {
         if (topic === "stored_new_clinic") {
-          const dentist = this.binArrayToJson(message);
+          const dentist = this.decodeBinArray(message);
           this.dentists.push(dentist);
           this.addMarker(dentist);
         }
         //TODO: Describe reaction to message here: process data and store it into an object in data()
       });
     },
+
+    // Adds markers on the map and popups to the markers //
     addMarker(dentist) {
+      //Creates a div and set the class name of that div for the marker
       const el = document.createElement("div");
       el.className = "marker";
-      new mapboxgl.Marker(el)
+
+      //Creates a parent div for the popup content
+      const popupContent = document.createElement("div")
+
+      //Creates a div for popup info and sets the html to display dentist info
+      const popupInfo = document.createElement("div")
+      popupInfo.innerHTML = `<h3>${dentist.name}</h3><div>${dentist.address}</div>`
+
+      //Creates a div with a book button
+      const bookingButton = document.createElement("div")
+      bookingButton.innerHTML = `<button>Book</button>`
+
+      //Adds a listener to the button calling a method
+      bookingButton.addEventListener('click', (e) => {
+        this.goToBooking(dentist)
+      })
+
+      //Add the popup info as a child of the popup content div
+      popupContent.appendChild(popupInfo)
+      //Add the booking button as a child of the popup content div
+      popupContent.appendChild(bookingButton)
+
+      //Creates a marker
+      const marker = new mapboxgl.Marker(el)
+
+      //Creates a popup
+      const popup = new mapboxgl.Popup({ offset: 25 })
+      popup.setDOMContent(popupContent) // sets the popup dom as the one defined in the popup content
+
+      marker.setLngLat([dentist.coordinate.longitude, dentist.coordinate.latitude])
+      marker.setPopup(popup)
+      marker.addTo(this.map)
+
+      /*new mapboxgl.Marker(el)
         .setLngLat([dentist.coordinate.longitude, dentist.coordinate.latitude])
         .setPopup(
-          new mapboxgl.Popup({ offset: 25 }) // add popups
+          popup // add popups
             .setHTML(
               `<h3>${dentist.name}</h3><div>${dentist.address}</div>
               <form action="./booking">
@@ -108,8 +150,12 @@ export default {
               </form>`
             )
         )
-        .addTo(this.map);
+        .addTo(this.map);*/
+
     },
+
+    // Creates the map object on the page //
+
     createMap() {
       mapboxgl.accessToken =
         "pk.eyJ1Ijoib2xnYXJhdHUiLCJhIjoiY2t3YzhrdWQ3MXZlbDJwcGF3ZmsyYXp3YSJ9.UILiP1r9n3yZ7MbHuW-ovQ";
@@ -124,66 +170,27 @@ export default {
         type: "FeatureCollection",
         features: [],
       };
-      function buildLocationList(geojson) {
-        for (const geojson of geojson.features) {
-          /* Add a new listing section to the sidebar. */
-          const listings = document.getElementById("listings");
-          const listing = listings.appendChild(document.createElement("div"));
-          /* Assign a unique `id` to the listing. */
-          listing.id = `listing-${geojson.properties.id}`;
-          /* Assign the `item` class to each listing for styling. */
-          listing.className = "item";
-
-          /* Add the link to the individual listing created above. */
-          const link = listing.appendChild(document.createElement("a"));
-          link.href = "#";
-          link.className = "title";
-          link.id = `link-${geojson.properties.id}`;
-          link.innerHTML = `${geojson.properties.title}`;
-
-          /* Add details to the individual listing. */
-          const details = listing.appendChild(document.createElement("div"));
-          details.innerHTML = `${geojson.properties.description}`;
-          if (geojson.properties.phone) {
-            details.innerHTML += ` · ${geojson.properties.phoneFormatted}`;
-          }
-          if (geojson.properties.distance) {
-            const roundedDistance =
-              Math.round(geojson.properties.distance * 100) / 100;
-            details.innerHTML += `<div><strong>${roundedDistance} miles away</strong></div>`;
-          }
-        }
-      }
-      geojson.features.forEach(function (geojson, i) {
-        geojson.properties.id = i;
-      }); //Assign a unique ID to each location/marker
       map.on("");
       map.on("load", () => {
         map.addLayer({
           id: "locations",
           type: "circle",
-          /* Add a GeoJSON source containing place coordinates and information. */
           source: {
             type: "geojson",
             data: geojson,
           },
-          // TODO: Here we want to load a layer
-          // TODO: Here we want to load/setup the popup
         });
-        buildLocationList(geojson);
       });
     },
     getAllDentists() {
       this.client.publish("get_all_clinics");
     },
   },
-
   name: "Mapbox",
 };
 </script>
 
 <style>
-
 p {
   font-size: small;
   font-weight: lighter;
@@ -304,8 +311,6 @@ a:hover {
   color: #101010;
 }
 
-/* The page is split between map and sidebar - the sidebar gets 1/3, map
-gets 2/3 of the page. You can adjust this to your personal liking. */
 .sidebar {
   position: absolute;
   width: 33.3333%;
