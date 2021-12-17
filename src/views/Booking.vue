@@ -36,7 +36,7 @@
     <div class="userInput">
       <label for="fname">First name:</label><br />
       <input type="text" id="fname" name="fname" value="" size="30" /><br />
-      <label for="lname">Emailadress:</label><br />
+      <label>Emailadress:</label><br />
       <input
         type="text"
         id="emailadress"
@@ -45,7 +45,7 @@
         value=""
         size="30"
       /><br />
-      <label for="lname">Phone number:</label><br />
+      <label>Phone number:</label><br />
       <input
         type="text"
         id="pnumber"
@@ -96,6 +96,13 @@ export default {
         connected: false,
       },
       subscribeSuccess: false,
+      subscriptionTopics: [
+        'Team5/Dentistimo/Booking/Create/Success',
+        'Team5/Dentistimo/Booking/Create/Fail',
+        '/Team5/Dentistimo/GenerateTimeSlots'
+        //TODO: add here all topics to subscribe to
+
+      ],
       onChangeTime(e) {
         //TODO: user for form submittion
         console.log(e.target.value);
@@ -159,11 +166,9 @@ export default {
         console.log("Connection succeeded!");
         //**************************************************************************************************************************** */
         //TODO: change to subscribe to availabilty checker
-        this.client.subscribe("/Team5/Dentistimo/TimeSlots", function (err) {
+        this.client.subscribe(this.subscriptionTopics, function (err) {
           if (!err) {
-            console.log(
-              "Subscribed to " + "/Team5/Dentistimo/TimeSlots" + " successfully"
-            );
+            console.log("Subscribed to all topics")
           } else {
             console.log(err.message);
           }
@@ -176,19 +181,40 @@ export default {
       //**************************************************************************************************************************** */
       //TODO: change to recieve from availablity checker
       this.client.on("message", (topic, message) => {
-        console.log(topic);
-        if (topic === "/Team5/Dentistimo/TimeSlots") {
-          try {
-            console.log("recieved message from timeSlotGenerator" + JSON.parse(message));
-            var data = JSON.parse(message);
-            this.timeSlots = data.timeSlots
-          } catch (error) {
-            console.log(error);
-          }
+
+        switch (topic){
+          case 'Team5/Dentistimo/Booking/Create/Success':
+            this.notifySuccess(message)
+            break;
+          case 'Team5/Dentistimo/Booking/Create/Fail':
+            this.notifyFailure(message)
+            break;
+          case '/Team5/Dentistimo/TimeSlots':
+            this.reactToTimeSlots(message)
+            break;
+          default:
+            break;
         }
       });
       //**************************************************************************************************************************** */
     },
+    notifySuccess(message){
+      let newBooking = JSON.parse(message)
+      alert('You have a new appointment at the clinic ' + newBooking.clinic.name + ' on the ' + newBooking.date + ' at ' + newBooking.startTime)
+    },
+    notifyFailure(message){
+      let error = JSON.parse(message)
+      alert('Something went wrong. Please contact the administrator. \n'+ 'Error message: ' + error.error )
+    },
+    reactToTimeSlots(message){
+      try {
+        console.log("received message from timeSlotGenerator" + JSON.parse(message));
+        let data = JSON.parse(message);
+        this.timeSlots = data.timeSlots
+      } catch (error) {
+        console.log(error);
+      }
+    }
   },
 };
 </script>
