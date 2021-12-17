@@ -20,7 +20,7 @@
       <input type="text" v-model="booking.ssn" name="fname" size="30" ><br>
     </div>
     <div>
-      <button type='button' v-on:click="sendBooking"> Submit </button>
+      <button type='button' v-on:click="sendBooking(); TimeStamp();"> Submit </button>
     </div>
   </form>
 </template>
@@ -69,7 +69,7 @@ export default {
     TimeStamp(){
       const date = new Date();
       const time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() +":"+ date.getMilliseconds()
-      console.log(time)
+      return time
     },
     createConnection() {
       // Connect string, and specify the connection method used through protocol
@@ -109,6 +109,9 @@ export default {
       })
     },
     sendBooking(){
+      //Reconstruct the JSON
+      this.booking.timeStamp = this.TimeStamp()
+      console.log(this.booking.timeStamp)
         this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
     },
 
