@@ -1,29 +1,27 @@
 <template>
 <div class="hi">
-</div>
 
+</div>
   <form>
     <div class="date">
   <label for="start">Please select a date and time for your appointment: &nbsp; &nbsp;
     <input type="date" id="start" name="trip-start"
-           min="2018-01-01" max="2022-12-31" required = "false">
+           min="2018-01-01" max="2022-12-31">
     <span class="validity"></span>
   </label></div>
     <div class="time">
-      <label for="time">Time: &nbsp;
-        <input type="time" id="start" name="trip-start"
+      <label>Time: &nbsp;
+        <input type="time"  name="trip-start"
                value="2018-07-22"
-               min="2018-01-01" max="2018-12-31" required = "false">
+               min="2018-01-01" max="2018-12-31" >
       </label></div>
     <div class="userInput">
-      <label for="ssn"> Social security number:</label><br>
-      <input type="text" v-model="booking.ssn" name="fname" size="30" required = "false"><br>
-      <label for="lname">Name:</label><br>
-      <input type="text" v-model="booking.fname" size="40" required = "false"><br>
-      <label for="lname">Emailadress:</label><br>
-      <input type="text" v-model="booking.email" style="" name="lname" size="30" required="false"><br>
+      <label > Social security number:</label><br>
+      <input type="text" v-model="booking.ssn" name="fname" size="30" ><br>
     </div>
-   <button @onClick='sendBooking'> Submit </button>
+    <div>
+      <button type='button' v-on:click="sendBooking"> Submit </button>
+    </div>
   </form>
 </template>
 
@@ -37,9 +35,9 @@ export default {
   data() {
     return {
       booking: {
-        fname: "",
-        email: "",
-        ssn: ""
+        ssn: '',
+        timeStamp : '',
+        clinicId: ''
       },
       connection: {
         host: '127.0.0.1',
@@ -73,7 +71,6 @@ export default {
       const time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() +":"+ date.getMilliseconds()
       console.log(time)
     },
-
     createConnection() {
       // Connect string, and specify the connection method used through protocol
       // ws unencrypted WebSocket connection
@@ -112,11 +109,7 @@ export default {
       })
     },
     sendBooking(){
-        console.log("hi");
         this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
-        if (err) {
-          console.error(err);
-        }
     },
 
     notifySuccess(message){
