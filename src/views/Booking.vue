@@ -3,7 +3,8 @@
 
   <div class="date" @change="onChangeDate($event)">
     <label for="start"
-      >Please select a date and time for your appointment: &nbsp; &nbsp; <br><br>
+      >Please select a date and time for your appointment: &nbsp; &nbsp;
+      <br /><br />
       <input
         type="date"
         id="start"
@@ -54,8 +55,7 @@
         required
       /><br />
       <p id="submit">
-        <button type='button' v-onclick="booking">This Button</button>
-        <!-- <button>Submit</button> -->
+        <button>Submit</button>
       </p>
     </div>
   </form>
@@ -66,6 +66,12 @@ import mqtt from "mqtt";
 
 export default {
   mounted() {
+    try {
+      this.dentist = JSON.parse(localStorage.getItem("selectedDentist"));
+    } catch (error) {
+      console.log(error);
+    }
+
     console.log("mounted");
     this.createConnection();
   },
@@ -91,135 +97,48 @@ export default {
       },
       subscribeSuccess: false,
       onChangeTime(e) {
+        //TODO: user for form submittion
         console.log(e.target.value);
       },
       onChangeDate(e) {
-        console.log(e.target.value);
-        /* var mqttPayload;
-        client.publish("/Team5/Dentistimo/GenerateTimeSlots", mqttPayload, {
-          qos: 1,
-        }); */
+        this.timeSlots = []
+        var day;
+        var date;
+        try {
+          date = new Date(Date.parse(e.target.value));
+          var weekday = new Array(
+            "sunday",
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday"
+          );
+          day = weekday[date.getDay()];
+        } catch (error) {
+          console.log(error);
+        }
+
+        if (day == "saturday" || day == "sunday") {
+          alert("Clinics are closed during the weekend");
+
+        } else {
+          console.log(e.target.value);
+          var mqttPayload = { date: e.target.value, clinic: this.dentist };
+          console.log("payload: " + JSON.stringify(mqttPayload));
+          this.client.publish(
+            "/Team5/Dentistimo/GenerateTimeSlots",
+            JSON.stringify(mqttPayload),
+            { qos: 1 }
+          );
+        }
       },
-      timeSlots: [
-        {
-          _id: "61b99f40a8ef5bf7d53703b4",
-          start: "9:00",
-          end: "9:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703b5",
-          start: "9:30",
-          end: "10:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703b6",
-          start: "10:00",
-          end: "10:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703b7",
-          start: "10:30",
-          end: "11:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703b8",
-          start: "11:00",
-          end: "11:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703b9",
-          start: "11:30",
-          end: "12:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703ba",
-          start: "12:00",
-          end: "12:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703bb",
-          start: "12:30",
-          end: "13:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703bc",
-          start: "13:00",
-          end: "13:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703bd",
-          start: "13:30",
-          end: "14:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703be",
-          start: "14:00",
-          end: "14:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703bf",
-          start: "14:30",
-          end: "15:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703c0",
-          start: "15:00",
-          end: "15:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703c1",
-          start: "15:30",
-          end: "16:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703c2",
-          start: "16:00",
-          end: "16:30",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-        {
-          _id: "61b99f40a8ef5bf7d53703c3",
-          start: "16:30",
-          end: "17:00",
-          available: 3,
-          date: "Thu Dec 02 2021",
-        },
-      ],
+      dentist: {},
+      timeSlots: [],
     };
   },
   methods: {
-    booking(){
-      alert('inside booking')
-    },
     // Create connection
     createConnection() {
       // Connect string, and specify the connection method used through protocol
@@ -238,20 +157,37 @@ export default {
       }
       this.client.on("connect", () => {
         console.log("Connection succeeded!");
-        //this.client.subscribe() //TODO: Define which topics to subscribe to for this page
+        //**************************************************************************************************************************** */
+        //TODO: change to subscribe to availabilty checker
+        this.client.subscribe("/Team5/Dentistimo/TimeSlots", function (err) {
+          if (!err) {
+            console.log(
+              "Subscribed to " + "/Team5/Dentistimo/TimeSlots" + " successfully"
+            );
+          } else {
+            console.log(err.message);
+          }
+        });
+        //**************************************************************************************************************************** */
       });
       this.client.on("error", (error) => {
         console.log("Connection failed", error);
       });
+      //**************************************************************************************************************************** */
+      //TODO: change to recieve from availablity checker
       this.client.on("message", (topic, message) => {
-        if (topic == "/Team5/Dentistimo/TimeSlots") {
+        console.log(topic);
+        if (topic === "/Team5/Dentistimo/TimeSlots") {
           try {
-            this.timeSlots = JSON.parse(message);
+            console.log("recieved message from timeSlotGenerator" + JSON.parse(message));
+            var data = JSON.parse(message);
+            this.timeSlots = data.timeSlots
           } catch (error) {
-            console.log(error)
+            console.log(error);
           }
         }
       });
+      //**************************************************************************************************************************** */
     },
   },
 };

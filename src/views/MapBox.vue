@@ -65,6 +65,8 @@ export default {
     },
     goToBooking(dentist){
       console.log(dentist)
+      localStorage.setItem('selectedDentist', JSON.stringify(dentist))
+      this.$router.push({ name: 'Booking'})
       //TODO: Change this method to store dentist in local storage and go to booking page
     },
     // Create mqtt connection //
@@ -112,7 +114,7 @@ export default {
 
       //Creates a div for popup info and sets the html to display dentist info
       const popupInfo = document.createElement("div")
-      popupInfo.innerHTML = `<h3>${dentist.name}</h3><div>${dentist.address}</div>`
+      popupInfo.innerHTML = `<div>${dentist.name}</div><div>${dentist.address}</div>`
 
       //Creates a div with a book button
       const bookingButton = document.createElement("div")
