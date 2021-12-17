@@ -5,27 +5,25 @@
   <form>
     <div class="date">
   <label for="start">Please select a date and time for your appointment: &nbsp; &nbsp;
-  <input type="date" id="start" name="trip-start"
-         min="2018-01-01" max="2022-12-31" required>
-  <span class="validity"></span>
+    <input type="date" id="start" name="trip-start"
+           min="2018-01-01" max="2022-12-31" required = "false">
+    <span class="validity"></span>
   </label></div>
-  <div class="time">
-    <label for="time">Time: &nbsp;
-  <input type="time" id="start" name="trip-start"
-         value="2018-07-22"
-         min="2018-01-01" max="2018-12-31">
-         </label></div>
-      <div class="userInput">
-<label for="fname">First name:</label><br>
-  <input type="text" id="fname" name="fname" value="" size="30"><br>
-  <label for="lname">Emailadress:</label><br>
-  <input type="text" id="emailadress" style="" name="lname" value="" size="30"><br>
-  <label for="lname">Phone number:</label><br>
-  <input type="text" id="pnumber" name="lname" value="" size="40" required><br>
-  </div>
-  <p>
-    <button>Submit</button>
-  </p>
+    <div class="time">
+      <label for="time">Time: &nbsp;
+        <input type="time" id="start" name="trip-start"
+               value="2018-07-22"
+               min="2018-01-01" max="2018-12-31" required = "false">
+      </label></div>
+    <div class="userInput">
+      <label for="ssn"> Social security number:</label><br>
+      <input type="text" v-model="booking.ssn" name="fname" size="30" required = "false"><br>
+      <label for="lname">Name:</label><br>
+      <input type="text" v-model="booking.fname" size="40" required = "false"><br>
+      <label for="lname">Emailadress:</label><br>
+      <input type="text" v-model="booking.email" style="" name="lname" size="30" required="false"><br>
+    </div>
+   <button @onClick='sendBooking'> Submit </button>
   </form>
 </template>
 
@@ -38,6 +36,11 @@ export default {
   },
   data() {
     return {
+      booking: {
+        fname: "",
+        email: "",
+        ssn: ""
+      },
       connection: {
         host: '127.0.0.1',
         port: 9001,
@@ -57,13 +60,20 @@ export default {
       subscribeSuccess: false,
       subscriptionTopics: [
         'Team5/Dentistimo/Booking/Create/Success',
-        'Team5/Dentistimo/Booking/Create/Fail'
+        'Team5/Dentistimo/Booking/Create/Fail',
+        'Team5/Dentistimo/Reject/Booking'
           //TODO: add here all topics to subscribe to
       ]
     }
   },
   methods: {
     // Create connection
+    TimeStamp(){
+      const date = new Date();
+      const time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() +":"+ date.getMilliseconds()
+      console.log(time)
+    },
+
     createConnection() {
       // Connect string, and specify the connection method used through protocol
       // ws unencrypted WebSocket connection
@@ -93,11 +103,22 @@ export default {
           case 'Team5/Dentistimo/Booking/Create/Success':
             this.notifySuccess(message)
                 break;
-            case 'Team5/Dentistimo/Booking/Create/Fail':
+          case 'Team5/Dentistimo/Booking/Create/Fail':
               this.notifyFailure(message)
+                break;
+          case  'Team5/Dentistimo/Reject/Booking':
+
         }
       })
     },
+    sendBooking(){
+        console.log("hi");
+        this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
+        if (err) {
+          console.error(err);
+        }
+    },
+
     notifySuccess(message){
       let newBooking = JSON.parse(message)
       alert('You have a new appointment at the clinic ' + newBooking.clinic.name + ' on the ' + newBooking.date + ' at ' + newBooking.startTime)
