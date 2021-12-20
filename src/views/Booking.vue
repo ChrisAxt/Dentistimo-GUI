@@ -6,6 +6,7 @@
       >Please select a date and time for your appointment: &nbsp; &nbsp;
       <br /><br />
       <input
+        v-model= "booking.date"
         type="date"
         id="start"
         name="trip-start"
@@ -21,8 +22,10 @@
     <div class="time">
       <select
         name="time"
+        v-model="booking.time"
         @change="onChangeTime($event)"
         class="form-select form-control"
+        required
       >
         <option>-- Select Time --</option>
         <option v-for="item in timeSlots" v-bind:key="item">
@@ -34,29 +37,11 @@
   <br />
   <form>
     <div class="userInput">
-      <label for="fname">First name:</label><br />
-      <input type="text" id="fname" name="fname" value="" size="30" /><br />
-      <label>Emailadress:</label><br />
-      <input
-        type="text"
-        id="emailadress"
-        style=""
-        name="lname"
-        value=""
-        size="30"
-      /><br />
-      <label>Phone number:</label><br />
-      <input
-        type="text"
-        id="pnumber"
-        name="lname"
-        value=""
-        size="40"
-        required
-      /><br />
-      <p id="submit">
-        <button>Submit</button>
-      </p>
+      <label > Social security number:</label><br>
+      <input type="text" v-model="booking.ssn" name="fname" size="30" required ><br>
+    </div>
+    <div>
+      <button type='button' v-on:click="sendBooking(); TimeStamp();"> Submit </button>
     </div>
   </form>
 </template>
@@ -72,11 +57,17 @@ export default {
       console.log(error);
     }
 
-    console.log("mounted");
     this.createConnection();
   },
   data() {
     return {
+      booking: {
+        ssn: '',
+        timeStamp : '',
+        clinicId: '',
+        date: '',
+        time: ''
+      },
       connection: {
         host: "127.0.0.1",
         port: 9001,
@@ -99,13 +90,13 @@ export default {
       subscriptionTopics: [
         'Team5/Dentistimo/Booking/Create/Success',
         'Team5/Dentistimo/Booking/Create/Fail',
-        '/Team5/Dentistimo/GenerateTimeSlots'
+        '/Team5/Dentistimo/TimeSlots',
+        'Team5/Dentistimo/Reject/Booking'
         //TODO: add here all topics to subscribe to
 
       ],
       onChangeTime(e) {
         //TODO: user for form submittion
-        console.log(e.target.value);
       },
       onChangeDate(e) {
         this.timeSlots = []
@@ -131,9 +122,8 @@ export default {
           alert("Clinics are closed during the weekend");
 
         } else {
-          console.log(e.target.value);
+
           var mqttPayload = { date: e.target.value, clinic: this.dentist };
-          console.log("payload: " + JSON.stringify(mqttPayload));
           this.client.publish(
             "/Team5/Dentistimo/GenerateTimeSlots",
             JSON.stringify(mqttPayload),
@@ -147,6 +137,11 @@ export default {
   },
   methods: {
     // Create connection
+    TimeStamp(){
+      const date = new Date();
+      const time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() +":"+ date.getMilliseconds()
+      return time
+    },
     createConnection() {
       // Connect string, and specify the connection method used through protocol
       // ws unencrypted WebSocket connection
@@ -192,12 +187,22 @@ export default {
           case '/Team5/Dentistimo/TimeSlots':
             this.reactToTimeSlots(message)
             break;
+          case  'Team5/Dentistimo/Reject/Booking':
+            this.notifyRejection(message)
+            break;
           default:
             break;
         }
       });
       //**************************************************************************************************************************** */
     },
+    sendBooking(){
+      //Reconstruct the JSON
+      this.booking.timeStamp = this.TimeStamp()
+        this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
+      this.booking.ssn = ''
+    },
+
     notifySuccess(message){
       let newBooking = JSON.parse(message)
       alert('You have a new appointment at the clinic ' + newBooking.clinic.name + ' on the ' + newBooking.date + ' at ' + newBooking.startTime)
@@ -208,12 +213,18 @@ export default {
     },
     reactToTimeSlots(message){
       try {
-        console.log("received message from timeSlotGenerator" + JSON.parse(message));
+        console.log("Received message from timeSlotGenerator");
         let data = JSON.parse(message);
         this.timeSlots = data.timeSlots
+        this.booking.clinicId = data.clinicId
+
       } catch (error) {
         console.log(error);
       }
+    },
+    notifyRejection(message){
+      let rejection = JSON.parse(message)
+      alert(rejection)
     }
   },
 };
@@ -284,7 +295,9 @@ p {
   background-attachment: fixed;
   color: white;
 }
+.button{
 
+}
 .days {
   width: 1100px;
   padding-left: 350px;

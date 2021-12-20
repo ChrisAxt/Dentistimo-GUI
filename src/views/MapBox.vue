@@ -64,7 +64,6 @@ export default {
       return JSON.parse(utf8decoder.decode(binArray));
     },
     goToBooking(dentist){
-      console.log(dentist)
       localStorage.setItem('selectedDentist', JSON.stringify(dentist))
       this.$router.push({ name: 'Booking'})
       //TODO: Change this method to store dentist in local storage and go to booking page
