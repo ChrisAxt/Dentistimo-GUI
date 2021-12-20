@@ -104,7 +104,8 @@ export default {
               this.notifyFailure(message)
                 break;
           case  'Team5/Dentistimo/Reject/Booking':
-
+            this.notifyRejection(message)
+                break;
         }
       })
     },
@@ -113,6 +114,7 @@ export default {
       this.booking.timeStamp = this.TimeStamp()
       console.log(this.booking.timeStamp)
         this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
+      this.booking.ssn = ''
     },
 
     notifySuccess(message){
@@ -122,6 +124,10 @@ export default {
     notifyFailure(message){
       let error = JSON.parse(message)
       alert('Something went wrong. Please contact the administrator. \n'+ 'Error message: ' + error.error )
+    },
+    notifyRejection(message){
+      let rejection = JSON.parse(message)
+      alert(rejection)
     }
   }
 }
