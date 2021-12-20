@@ -117,12 +117,9 @@ export default {
         } catch (error) {
           console.log(error);
         }
-
         if (day == "saturday" || day == "sunday") {
           alert("Clinics are closed during the weekend");
-
         } else {
-
           var mqttPayload = { date: e.target.value, clinic: this.dentist };
           this.client.publish(
             "/Team5/Dentistimo/GenerateTimeSlots",
@@ -202,14 +199,21 @@ export default {
         this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
       this.booking.ssn = ''
     },
-
     notifySuccess(message){
-      let newBooking = JSON.parse(message)
-      alert('You have a new appointment at the clinic ' + newBooking.clinic.name + ' on the ' + newBooking.date + ' at ' + newBooking.startTime)
+      try {
+        let newBooking = JSON.parse(message);
+        alert('You have a new appointment at the clinic ' + newBooking.clinic.name + ' on the ' + newBooking.date + ' at ' + newBooking.startTime);
+      } catch (error) {
+        console.log(error);
+      }
     },
     notifyFailure(message){
-      let error = JSON.parse(message)
-      alert('Something went wrong. Please contact the administrator. \n'+ 'Error message: ' + error.error )
+      try {
+        let error = JSON.parse(message);
+        alert('Something went wrong. Please contact the administrator. \n'+ 'Error message: ' + error.error );
+      } catch (error) {
+        console.log(error);
+      }
     },
     reactToTimeSlots(message){
       try {
@@ -217,14 +221,17 @@ export default {
         let data = JSON.parse(message);
         this.timeSlots = data.timeSlots
         this.booking.clinicId = data.clinicId
-
       } catch (error) {
         console.log(error);
       }
     },
     notifyRejection(message){
-      let rejection = JSON.parse(message)
-      alert(rejection)
+      try {
+        let rejection = JSON.parse(message)
+        alert(rejection)
+      } catch (error) {
+        console.log(error)
+      }
     }
   },
 };
