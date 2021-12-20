@@ -57,7 +57,6 @@ export default {
       console.log(error);
     }
 
-    console.log("mounted");
     this.createConnection();
   },
   data() {
@@ -98,7 +97,6 @@ export default {
       ],
       onChangeTime(e) {
         //TODO: user for form submittion
-        console.log(e.target.value);
       },
       onChangeDate(e) {
         this.timeSlots = []
@@ -124,9 +122,8 @@ export default {
           alert("Clinics are closed during the weekend");
 
         } else {
-          console.log(e.target.value);
+
           var mqttPayload = { date: e.target.value, clinic: this.dentist };
-          console.log("payload: " + JSON.stringify(mqttPayload));
           this.client.publish(
             "/Team5/Dentistimo/GenerateTimeSlots",
             JSON.stringify(mqttPayload),
@@ -202,10 +199,6 @@ export default {
     sendBooking(){
       //Reconstruct the JSON
       this.booking.timeStamp = this.TimeStamp()
-      console.log(this.booking.date)
-      console.log(this.booking.time)
-      console.log(this.booking.timeStamp)
-      console.log(this.booking.clinicId)
         this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
       this.booking.ssn = ''
     },
@@ -220,11 +213,11 @@ export default {
     },
     reactToTimeSlots(message){
       try {
-        console.log("received message from timeSlotGenerator" + JSON.parse(message));
+        console.log("Received message from timeSlotGenerator");
         let data = JSON.parse(message);
         this.timeSlots = data.timeSlots
         this.booking.clinicId = data.clinicId
-        console.log(this.booking.clinicId)
+
       } catch (error) {
         console.log(error);
       }
