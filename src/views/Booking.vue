@@ -6,6 +6,7 @@
       >Please select a date and time for your appointment: &nbsp; &nbsp;
       <br /><br />
       <input
+        v-model= "booking.date"
         type="date"
         id="start"
         name="trip-start"
@@ -21,8 +22,10 @@
     <div class="time">
       <select
         name="time"
+        v-model="booking.time"
         @change="onChangeTime($event)"
         class="form-select form-control"
+        required
       >
         <option>-- Select Time --</option>
         <option v-for="item in timeSlots" v-bind:key="item">
@@ -35,7 +38,7 @@
   <form>
     <div class="userInput">
       <label > Social security number:</label><br>
-      <input type="text" v-model="booking.ssn" name="fname" size="30" ><br>
+      <input type="text" v-model="booking.ssn" name="fname" size="30" required ><br>
     </div>
     <div>
       <button type='button' v-on:click="sendBooking(); TimeStamp();"> Submit </button>
@@ -62,7 +65,9 @@ export default {
       booking: {
         ssn: '',
         timeStamp : '',
-        clinicId: ''
+        clinicId: '',
+        date: '',
+        time: ''
       },
       connection: {
         host: "127.0.0.1",
@@ -86,7 +91,7 @@ export default {
       subscriptionTopics: [
         'Team5/Dentistimo/Booking/Create/Success',
         'Team5/Dentistimo/Booking/Create/Fail',
-        '/Team5/Dentistimo/GenerateTimeSlots',
+        '/Team5/Dentistimo/TimeSlots',
         'Team5/Dentistimo/Reject/Booking'
         //TODO: add here all topics to subscribe to
 
@@ -197,7 +202,10 @@ export default {
     sendBooking(){
       //Reconstruct the JSON
       this.booking.timeStamp = this.TimeStamp()
+      console.log(this.booking.date)
+      console.log(this.booking.time)
       console.log(this.booking.timeStamp)
+      console.log(this.booking.clinicId)
         this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
       this.booking.ssn = ''
     },
@@ -215,6 +223,8 @@ export default {
         console.log("received message from timeSlotGenerator" + JSON.parse(message));
         let data = JSON.parse(message);
         this.timeSlots = data.timeSlots
+        this.booking.clinicId = data.clinicId
+        console.log(this.booking.clinicId)
       } catch (error) {
         console.log(error);
       }
@@ -292,7 +302,9 @@ p {
   background-attachment: fixed;
   color: white;
 }
+.button{
 
+}
 .days {
   width: 1100px;
   padding-left: 350px;
