@@ -6,7 +6,7 @@
       >Please select a date and time for your appointment: &nbsp; &nbsp;
       <br /><br />
       <input
-        v-model="booking.date"
+        v-model= "booking.date"
         type="date"
         id="start"
         name="trip-start"
@@ -47,15 +47,7 @@
       /><br />
     </div>
     <div>
-      <button
-        type="button"
-        v-on:click="
-          sendBooking();
-          TimeStamp();
-        "
-      >
-        Submit
-      </button>
+      <button type='button' v-on:click="sendBooking(); TimeStamp();"> Submit </button>
     </div>
   </form>
 </template>
@@ -133,7 +125,9 @@ export default {
 
         if (day == "saturday" || day == "sunday") {
           alert("Clinics are closed during the weekend");
+
         } else {
+
           var mqttPayload = { date: e.target.value, clinic: this.dentist };
           this.client.publish(
             "/Team5/Dentistimo/GenerateTimeSlots",
@@ -207,7 +201,7 @@ export default {
       });
       //**************************************************************************************************************************** */
     },
-    sendBooking() {
+    sendBooking(){
       //Reconstruct the JSON
       this.booking.timeStamp = this.TimeStamp();
       this.client.publish(
@@ -219,25 +213,21 @@ export default {
       this.booking.time = "";
     },
 
-    notifySuccess(message) {
-      let newBooking = JSON.parse(message);
-      console.log(newBooking);
-      alert(
-        "You have a new appointment at the clinic " +
-          newBooking.clinic.name +
-          " on the " +
-          newBooking.date +
-          " at " +
-          newBooking.startTime
-      );
+    notifySuccess(message){
+      try {
+        let newBooking = JSON.parse(message);
+        alert('You have a new appointment at the clinic ' + newBooking.clinic.name + ' on the ' + newBooking.date + ' at ' + newBooking.startTime);
+      } catch (error) {
+        console.log(error);
+      }
     },
-    notifyFailure(message) {
-      let error = JSON.parse(message);
-      alert(
-        "Something went wrong. Please contact the administrator. \n" +
-          "Error message: " +
-          error.error
-      );
+    notifyFailure(message){
+      try {
+        let error = JSON.parse(message);
+        alert('Something went wrong. Please contact the administrator. \n'+ 'Error message: ' + error.error );
+      } catch (error) {
+        console.log(error);
+      }
     },
     reactToTimeSlots(message) {
       try {
@@ -249,10 +239,14 @@ export default {
         console.log(error);
       }
     },
-    notifyRejection(message) {
-      let rejection = JSON.parse(message);
-      alert(rejection);
-    },
+    notifyRejection(message){
+      try {
+        let rejection = JSON.parse(message)
+        alert(rejection)
+      } catch (error) {
+        console.log(error)
+      }
+    }
   },
 };
 </script>
@@ -322,7 +316,8 @@ p {
   background-attachment: fixed;
   color: white;
 }
-.button {
+.button{
+
 }
 .days {
   width: 1100px;

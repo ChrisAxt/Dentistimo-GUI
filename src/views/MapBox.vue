@@ -60,8 +60,12 @@ export default {
   methods: {
     // Parsing the received binary array to JSON objects //
     decodeBinArray(binArray) {
-      let utf8decoder = new TextDecoder("utf8");
-      return JSON.parse(utf8decoder.decode(binArray));
+      try {
+        let utf8decoder = new TextDecoder("utf8");
+        return JSON.parse(utf8decoder.decode(binArray));
+      } catch (error) {
+        console.log(error)
+      }
     },
     goToBooking(dentist){
       localStorage.setItem('selectedDentist', JSON.stringify(dentist))
