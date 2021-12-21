@@ -147,19 +147,12 @@ export default {
     };
   },
   methods: {
-    // Create connection
+   // Return timestamp in milliseconds
     TimeStamp() {
-      const date = new Date();
-      const time =
-        date.getHours() +
-        ":" +
-        date.getMinutes() +
-        ":" +
-        date.getSeconds() +
-        ":" +
-        date.getMilliseconds();
-      return time;
+      const date = Date.now()
+      return date;
     },
+    // Create connection
     createConnection() {
       // Connect string, and specify the connection method used through protocol
       // ws unencrypted WebSocket connection
