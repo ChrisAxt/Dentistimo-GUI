@@ -3,7 +3,7 @@
     <div class="heading">
       <h1>Dentist locations</h1>
     </div>
-    <error-message :message="this.errorMessage" v-if="!this.isOnline"></error-message>
+    <error-message v-if="!this.isOnline" :message="this.errorMessage" ></error-message>
     <div v-else id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
@@ -39,7 +39,7 @@ export default {
   },
   data() {
     return {
-      isOnline: true,
+      isOnline: false,
       connection: {
         host: "127.0.0.1",
         port: 9001,
@@ -110,6 +110,7 @@ export default {
       this.client.on("message", (topic, message) => {
         switch(topic){
           case "stored_new_clinic":
+            this.isOnline = true
             this.generateOnMap(message);
             break;
           case 'Team5/Dentistimo/ClinicHandler/LastWill':
