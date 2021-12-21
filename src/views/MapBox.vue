@@ -216,6 +216,10 @@ p.address {
   height: 100vh;
   position: relative;
 }
+.col-sm-3{
+  overflow: auto;
+  margin: 0 auto;
+}
 .marker {
   background-image: url("../assets/be_a_denist.png");
   background-size: cover;
@@ -235,6 +239,7 @@ p.address {
 }
 
 .listings {
+  padding-top: 10%;
   height: 100%;
   padding-bottom: 60px;
   padding-left: 10%
@@ -278,6 +283,7 @@ p.address {
   height: 3px;
   border-left: 0;
   background: rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
 }
 
 ::-webkit-scrollbar-track {
@@ -301,7 +307,8 @@ body {
 h1 {
   font-size: 22px;
   font-weight: 400;
-  line-height: 20px; 
+  line-height: 20%; 
+  padding-left: 10%;
 }
 
 a {
@@ -331,9 +338,8 @@ a:hover {
 
 .heading {
   background: #fff;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1% solid #eee;
   height: 60px;
   line-height: 60px;
-  
 }
 </style>
