@@ -3,7 +3,8 @@
     <div class="heading">
       <h1>Dentist locations</h1>
     </div>
-    <div id="listings" class="listings">
+    <error-message :message="this.errorMessage" v-if="!this.isOnline"></error-message>
+    <div v-else id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
         <p class="address">Address: {{ dentist.address }}</p>
@@ -25,8 +26,12 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mqtt from "mqtt";
+import ErrorMessage from '/src/components/ErrorMessage.vue'
 
 export default {
+  components: {
+    ErrorMessage
+  },
   mounted() {
     this.createMap();
     this.createConnection();
@@ -34,6 +39,7 @@ export default {
   },
   data() {
     return {
+      isOnline: false,
       connection: {
         host: "127.0.0.1",
         port: 9001,
@@ -53,6 +59,14 @@ export default {
         connected: false,
       },
       subscribeSuccess: false,
+      subscriptionTopics: [
+        'Team5/Dentistimo/BookingHandler/LastWill',
+        'Team5/Dentistimo/ClinicHandler/LastWill',
+        'Team5/Dentistimo/TimeSlotGenerator/LastWill',
+        'Team5/Dentistimo/AvailabilityChecker/LastWill',
+        "stored_new_clinic"
+      ],
+      errorMessage: "We are experiencing difficulties. Please try again later",
       map: {},
       dentists: [],
     };
@@ -77,35 +91,45 @@ export default {
       // Connect string, and specify the connection method used through protocol //
       const { host, port, endpoint, ...options } = this.connection;
       const connectUrl = `ws://${host}:${port}${endpoint}`;
+
       try {
         this.client = mqtt.connect(connectUrl, options);
       } catch (error) {
         console.log("mqtt.connect error", error);
       }
+
       this.client.on("connect", () => {
         console.log("Connection succeeded!");
-        this.client.subscribe("stored_new_clinic", function (err) {
+        this.client.subscribe(this.subscriptionTopics, function (err) {
           if (err) {
             console.error(err);
           }
         }); //TODO: Define which topics to subscribe to for this page
       });
+
       this.client.on("error", (error) => {
         console.log("Connection failed", error);
       });
 
-      // Subscribes to clinic handler //
-
       this.client.on("message", (topic, message) => {
-        if (topic === "stored_new_clinic") {
-          const dentist = this.decodeBinArray(message);
-          this.dentists.push(dentist);
-          this.addMarker(dentist);
+        switch(topic){
+          case "stored_new_clinic":
+            this.isOnline = true
+            this.generateOnMap(message);
+            break;
+          case 'Team5/Dentistimo/ClinicHandler/LastWill':
+                this.isOnline = false
+                break;
+          default:
+            break
         }
-        //TODO: Describe reaction to message here: process data and store it into an object in data()
       });
     },
-
+    generateOnMap(message){
+      const dentist = this.decodeBinArray(message);
+      this.dentists.push(dentist);
+      this.addMarker(dentist);
+    },
     // Adds markers on the map and popups to the markers //
     addMarker(dentist) {
       //Creates a div and set the class name of that div for the marker
@@ -143,20 +167,6 @@ export default {
       marker.setLngLat([dentist.coordinate.longitude, dentist.coordinate.latitude])
       marker.setPopup(popup)
       marker.addTo(this.map)
-
-      /*new mapboxgl.Marker(el)
-        .setLngLat([dentist.coordinate.longitude, dentist.coordinate.latitude])
-        .setPopup(
-          popup // add popups
-            .setHTML(
-              `<h3>${dentist.name}</h3><div>${dentist.address}</div>
-              <form action="./booking">
-              <input type="submit" value="Book" color="blue"/>
-              </form>`
-            )
-        )
-        .addTo(this.map);*/
-
     },
 
     // Creates the map object on the page //
@@ -341,4 +351,5 @@ a:hover {
   line-height: 60px;
   padding: 0 10px;
 }
+
 </style>
