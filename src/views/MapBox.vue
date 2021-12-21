@@ -1,24 +1,30 @@
 <template>
+<div class="row">
+  <div class="col-sm-3">
   <div class="sidebar">
     <div class="heading">
-      <h1>Dentist locations</h1>
+      <h1> Dentist locations</h1>
     </div>
     <div id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
         <p class="address">Address: {{ dentist.address }}</p>
         <p>
-          Monday: {{ dentist.openinghours.monday }} Tuesday:
-          {{ dentist.openinghours.tuesday }} Wednesday:
-          {{ dentist.openinghours.wednesday }} Thursday:
-          {{ dentist.openinghours.thursday }} Friday:
-          {{ dentist.openinghours.friday }}
+          Monday: {{ dentist.openinghours.monday }} <br>
+          Tuesday: {{ dentist.openinghours.tuesday }} <br>
+          Wednesday: {{ dentist.openinghours.wednesday }} <br>
+          Thursday: {{ dentist.openinghours.thursday }} <br>
+          Friday: {{ dentist.openinghours.friday }}
         </p>
       </div>
     </div>
   </div>
+  </div>
+  <div class="col-sm-9">
   <div id="map" class="map"></div>
   <div id="app"></div>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -196,18 +202,16 @@ p {
   font-size: small;
   font-weight: lighter;
   position: relative;
-  right: 350px;
+  
 }
 
 p.address {
   font-size: medium;
   font-weight: normal;
   white-space: nowrap;
+  
 }
 
-.button {
-  background-color: blue;
-}
 #map {
   height: 100vh;
   position: relative;
@@ -232,8 +236,8 @@ p.address {
 
 .listings {
   height: 100%;
-  overflow: auto;
   padding-bottom: 60px;
+  padding-left: 10%
 }
 
 .listings .item {
@@ -243,6 +247,7 @@ p.address {
   color: #16653a;
   font-weight: bold;
   font-size: large;
+  
 }
 
 .listings .item:last-child {
@@ -290,17 +295,13 @@ p.address {
 body {
   color: #404040;
   font: 400 15px/22px "Source Sans Pro", "Helvetica Neue", sans-serif;
-  margin: 0;
-  padding: 0;
   -webkit-font-smoothing: antialiased;
 }
 
 h1 {
   font-size: 22px;
-  margin: 0;
   font-weight: 400;
-  line-height: 20px;
-  padding: 20px 2px;
+  line-height: 20px; 
 }
 
 a {
@@ -314,18 +315,16 @@ a:hover {
 
 .sidebar {
   position: absolute;
-  width: 33.3333%;
+  width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-  overflow: hidden;
-  border-right: 1px solid rgba(0, 0, 0, 0.25);
+  border-right: 0px solid rgba(0, 0, 0, 0.25);
 }
 
 .map {
   position: absolute;
-  left: 33.3333%;
-  width: 66.6666%;
+  width: 100%;
   top: 0;
   bottom: 0;
 }
@@ -335,6 +334,6 @@ a:hover {
   border-bottom: 1px solid #eee;
   height: 60px;
   line-height: 60px;
-  padding: 0 10px;
+  
 }
 </style>
