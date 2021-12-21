@@ -37,8 +37,14 @@
   <br />
   <form>
     <div class="userInput">
-      <label > Social security number:</label><br>
-      <input type="text" v-model="booking.ssn" name="fname" size="30" required ><br>
+      <label> Social security number:</label><br />
+      <input
+        type="text"
+        v-model="booking.ssn"
+        name="fname"
+        size="30"
+        required
+      /><br />
     </div>
     <div>
       <button type='button' v-on:click="sendBooking(); TimeStamp();"> Submit </button>
@@ -62,11 +68,11 @@ export default {
   data() {
     return {
       booking: {
-        ssn: '',
-        timeStamp : '',
-        clinicId: '',
-        date: '',
-        time: ''
+        ssn: "",
+        timeStamp: "",
+        clinicId: "",
+        date: "",
+        time: "",
       },
       connection: {
         host: "127.0.0.1",
@@ -88,18 +94,17 @@ export default {
       },
       subscribeSuccess: false,
       subscriptionTopics: [
-        'Team5/Dentistimo/Booking/Create/Success',
-        'Team5/Dentistimo/Booking/Create/Fail',
-        '/Team5/Dentistimo/TimeSlots',
-        'Team5/Dentistimo/Reject/Booking'
+        "Team5/Dentistimo/Booking/Create/Success",
+        "Team5/Dentistimo/Booking/Create/Fail",
+        "Team5/Dentistimo/Timeslots/Validated",
+        "Team5/Dentistimo/Reject/Booking",
         //TODO: add here all topics to subscribe to
-
       ],
       onChangeTime(e) {
         //TODO: user for form submittion
       },
       onChangeDate(e) {
-        this.timeSlots = []
+        this.timeSlots = [];
         var day;
         var date;
         try {
@@ -117,9 +122,12 @@ export default {
         } catch (error) {
           console.log(error);
         }
+
         if (day == "saturday" || day == "sunday") {
           alert("Clinics are closed during the weekend");
+
         } else {
+
           var mqttPayload = { date: e.target.value, clinic: this.dentist };
           this.client.publish(
             "/Team5/Dentistimo/GenerateTimeSlots",
@@ -133,12 +141,12 @@ export default {
     };
   },
   methods: {
-    // Create connection
-    TimeStamp(){
-      const date = new Date();
-      const time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() +":"+ date.getMilliseconds()
-      return time
+   // Return timestamp in milliseconds
+    TimeStamp() {
+      const date = Date.now()
+      return date;
     },
+    // Create connection
     createConnection() {
       // Connect string, and specify the connection method used through protocol
       // ws unencrypted WebSocket connection
@@ -160,7 +168,7 @@ export default {
         //TODO: change to subscribe to availabilty checker
         this.client.subscribe(this.subscriptionTopics, function (err) {
           if (!err) {
-            console.log("Subscribed to all topics")
+            console.log("Subscribed to all topics");
           } else {
             console.log(err.message);
           }
@@ -173,19 +181,19 @@ export default {
       //**************************************************************************************************************************** */
       //TODO: change to recieve from availablity checker
       this.client.on("message", (topic, message) => {
-
-        switch (topic){
-          case 'Team5/Dentistimo/Booking/Create/Success':
-            this.notifySuccess(message)
+        console.log(topic);
+        switch (topic) {
+          case "Team5/Dentistimo/Booking/Create/Success":
+            this.notifySuccess(message);
             break;
-          case 'Team5/Dentistimo/Booking/Create/Fail':
-            this.notifyFailure(message)
+          case "Team5/Dentistimo/Booking/Create/Fail":
+            this.notifyFailure(message);
             break;
-          case '/Team5/Dentistimo/TimeSlots':
-            this.reactToTimeSlots(message)
+          case "Team5/Dentistimo/Timeslots/Validated":
+            this.reactToTimeSlots(message);
             break;
-          case  'Team5/Dentistimo/Reject/Booking':
-            this.notifyRejection(message)
+          case "Team5/Dentistimo/Reject/Booking":
+            this.notifyRejection(message);
             break;
           default:
             break;
@@ -195,10 +203,16 @@ export default {
     },
     sendBooking(){
       //Reconstruct the JSON
-      this.booking.timeStamp = this.TimeStamp()
-        this.client.publish("Team5/Dentistimo/Check/Booking", JSON.stringify(this.booking));
-      this.booking.ssn = ''
+      this.booking.timeStamp = this.TimeStamp();
+      this.client.publish(
+        "Team5/Dentistimo/Check/Booking",
+        JSON.stringify(this.booking)
+      );
+      this.booking.ssn = "";
+      this.booking.date = "";
+      this.booking.time = "";
     },
+
     notifySuccess(message){
       try {
         let newBooking = JSON.parse(message);
@@ -215,12 +229,12 @@ export default {
         console.log(error);
       }
     },
-    reactToTimeSlots(message){
+    reactToTimeSlots(message) {
       try {
         console.log("Received message from timeSlotGenerator");
         let data = JSON.parse(message);
-        this.timeSlots = data.timeSlots
-        this.booking.clinicId = data.clinicId
+        this.timeSlots = data.timeSlots;
+        this.booking.clinicId = data.clinicId;
       } catch (error) {
         console.log(error);
       }
