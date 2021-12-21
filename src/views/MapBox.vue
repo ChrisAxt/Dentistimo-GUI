@@ -3,7 +3,7 @@
     <div class="heading">
       <h1>Dentist locations</h1>
     </div>
-    <error-message v-if="!this.isOnline" :message="this.errorMessage" ></error-message>
+    <error-message :message="this.errorMessage" v-if="!this.isOnline"></error-message>
     <div v-else id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
