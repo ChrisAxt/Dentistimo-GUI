@@ -215,6 +215,8 @@ export default {
         JSON.stringify(this.booking)
       );
       this.booking.ssn = "";
+      this.booking.date = "";
+      this.booking.time = "";
     },
 
     notifySuccess(message) {
