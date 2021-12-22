@@ -322,11 +322,5 @@ p {
 button:hover{
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 } 
- .col-sm-4 {
-  outline: 2px solid #ccc;
-    outline-offset: -10px;
-    -moz-outline-radius: 10px;
-    -webkit-outline-radius: 10px;
-} 
 
 </style>
