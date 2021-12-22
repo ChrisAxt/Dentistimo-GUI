@@ -31,7 +31,7 @@
         v-model="booking.time"
         required
       >
-        <option>-- Select Time --</option>
+        <option>------ Select Time ------</option>
         <option v-for="item in timeSlots" v-bind:key="item">
           {{ item.start + "-" + item.end }}
         </option>
@@ -42,7 +42,7 @@
   <form>
     <div class="userInput">
       <label > Social security number:</label><br>
-      <input type="text" v-model="booking.ssn" name="fname" size="40" required ><br>
+      <input type="text" v-model="booking.ssn" name="fname" required ><br>
     </div><br>
     <div align="center">
       <button type='button'  v-on:click="sendBooking(); TimeStamp();"> Submit </button>
@@ -247,25 +247,24 @@ export default {
   padding-top: 2%;
   padding-bottom: 0.5%;
 }
-
 .time {
   position: relative;
   display: flex;
   align-items: center;
-   padding-left: 18%; 
-  width: fit-content;
+  padding-left: 18%; 
+  width: 70%;
   padding-bottom: 1%;
 }
-
+input{
+  width: 70%;
+}
 .userInput {
   padding-left: 18%;
   padding-bottom: 0.5%;
 }
-
 span::after {
    padding-left: 5px; 
 }
-
 input:invalid + span::after {
   content: "✖";
   color: red;
