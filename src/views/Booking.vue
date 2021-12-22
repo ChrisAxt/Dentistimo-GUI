@@ -1,10 +1,10 @@
 <template>
 <div class="row1">
-  <!-- <div class="hi"></div> --></div>
+  </div>
     <div class="row">
   <div class="col-sm-4"></div>
-  <div class="col-sm-4" >
-    <h1 align="center">{{dentist.name}} </h1><br>
+  <div class="col-sm-4">
+  <h1 align="center">{{dentist.name}}</h1><br>
   <div class="date" @change="onChangeDate($event)">
     <label for="start"
       >Please select a date and time for your appointment: &nbsp; &nbsp;
@@ -49,8 +49,8 @@
         size="30"
         required
       /><br />
-    </div>
-    <div>
+    </div><br>
+    <div align="center">
       <button type='button' v-on:click="sendBooking(); TimeStamp();"> Submit </button>
     </div>
   </form></div>
@@ -322,11 +322,11 @@ p {
 button:hover{
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 } 
-/* .col-sm-4 {
+ .col-sm-4 {
   outline: 2px solid #ccc;
     outline-offset: -10px;
     -moz-outline-radius: 10px;
     -webkit-outline-radius: 10px;
-} */
+} 
 
 </style>

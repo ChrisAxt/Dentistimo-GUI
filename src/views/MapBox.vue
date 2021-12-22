@@ -3,7 +3,7 @@
   <div class="col-sm-3">
   <div class="sidebar">
     <div class="heading">
-      <h1> Dentist locations</h1>
+      <h2> Dentist locations</h2>
     </div>
     <error-message :message="this.errorMessage" v-if="!this.isOnline"></error-message>
     <div v-else id="listings" class="listings">
@@ -211,12 +211,11 @@ export default {
 };
 </script>
 
-<style>
+<style >
 p {
   font-size: small;
   font-weight: lighter;
   position: relative;
-  
 }
 
 p.address {
@@ -318,10 +317,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: 22px;
-  font-weight: 400;
-  line-height: 20%; 
+h2 {
+  text-size-adjust: auto;
   padding-left: 10%;
 }
 
