@@ -230,6 +230,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
+      this.$router.push({ name: 'home'})
     },
     notifyFailure(message){
       try {
@@ -238,6 +239,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
+      this.$router.push({ name: 'home'})
     },
     reactToTimeSlots(message) {
       try {
