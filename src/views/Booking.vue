@@ -24,6 +24,7 @@
   </div>
   <br />
   <div>
+    <div class="avaliableTime">Avaliable time slots:</div>
     <div class="time">
       <select
         class="form-select form-control"
@@ -267,6 +268,10 @@ export default {
   padding-left: 18%;
   padding-top: 2%;
   padding-bottom: 0.5%;
+}
+.avaliableTime{
+  padding-left: 18%;
+  padding-bottom: 1%;
 }
 .time {
   position: relative;
