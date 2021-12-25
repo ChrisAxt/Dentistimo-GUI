@@ -41,5 +41,21 @@ npm run serve
 npm run build
 ```
 
+### Configuration with backend
+ 
+   In order to receive clinic data and see available bookings, it's necessary to setup a terminal running the clinic handler and one with mosquitto.
+
+ **Mosquitto terminal (on Mac)**
+
+Before you continue, make sure you have [mosquitto](https://mosquitto.org/download/) installed on your computer 
+
+    1. Open terminal window
+
+    2. Copy and paste following command `/opt/homebrew/opt/mosquitto/sbin/mosquitto -c /opt/homebrew/etc/mosquitto/mosquitto.conf`
+
+    3. If everything works, you should recieve the following message 
+
+![Successful terminal view](https://ibb.co/XbfGR6C)
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
