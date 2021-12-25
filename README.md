@@ -49,13 +49,26 @@ npm run build
 
 Before you continue, make sure you have [mosquitto](https://mosquitto.org/download/) installed on your computer 
 
-    1. Open terminal window
+  1. Open new terminal window
 
-    2. Copy and paste following command `/opt/homebrew/opt/mosquitto/sbin/mosquitto -c /opt/homebrew/etc/mosquitto/mosquitto.conf`
+  2. Copy and paste following command `/opt/homebrew/opt/mosquitto/sbin/mosquitto -c /opt/homebrew/etc/mosquitto/mosquitto.conf`
 
-    3. If everything works, you should recieve the following message 
+  3. If everything works, you should recieve the following message 
 
-![Successful terminal view](https://ibb.co/XbfGR6C)
+  ![Screenshot_2021-12-25_at_15.35.58](/uploads/53b9f9b74c854b7a04cd188147d989e1/Screenshot_2021-12-25_at_15.35.58.png)
+
+  **Running clinic handler**
+ 
+ 1. Clone the clinic handler repository 
+    
+ 2. Open new terminal window
+
+ 3. type _ls_ to see where you are
+
+ 4. You should be able to see the team-5-clinic-handler folder, type cd to go in to the folder
+
+ 5. Inside the folder, type npm start to start the clinic handler
+
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
