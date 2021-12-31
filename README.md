@@ -53,22 +53,25 @@ Before you continue, make sure you have [mosquitto](https://mosquitto.org/downlo
 
   2. Copy and paste following command `/opt/homebrew/opt/mosquitto/sbin/mosquitto -c /opt/homebrew/etc/mosquitto/mosquitto.conf`
 
-  3. If everything works, you should recieve the following message 
+  3. If everything works, your terminal output should look like this 
 
   ![Screenshot_2021-12-25_at_15.35.58](/uploads/53b9f9b74c854b7a04cd188147d989e1/Screenshot_2021-12-25_at_15.35.58.png)
 
   **Running clinic handler**
  
- 1. Clone the clinic handler repository 
+ 1. Clone the clinic handler repository [here](https://git.chalmers.se/courses/dit355/test-teams-formation/team-5/team-5-clinics-service)
     
  2. Open new terminal window
 
- 3. type _ls_ to see where you are
+ 3. type `ls` to see where you are
 
- 4. You should be able to see the team-5-clinic-handler folder, type cd to go in to the folder
+ 4. You should be able to see the team-5-clinics-service folder, type `cd` to go in to the folder
 
- 5. Inside the folder, type npm start to start the clinic handler
+ 5. Inside the folder, type `npm start` to start the clinic handler
+ 
+ 6. If successful, your terminal output should look like this:
 
+  ![Screenshot_2021-12-31_at_01.43.52](/uploads/3459b81b09343a48b094d7b0255670bc/Screenshot_2021-12-31_at_01.43.52.png)
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
