@@ -1,6 +1,10 @@
 <template>
-  <div class="hi"></div>
-
+<div class="row1">
+  </div>
+    <div class="row">
+  <div class="col-sm-4"></div>
+  <div class="col-sm-4">
+  <h1 align="center">{{dentist.name}}</h1><br>
   <div class="date" @change="onChangeDate($event)">
     <label for="start"
       >Please select a date and time for your appointment: &nbsp; &nbsp;
@@ -12,6 +16,7 @@
         name="trip-start"
         min="2018-01-01"
         max="2022-12-31"
+        width="1000"
         required
       />
       <span class="validity"></span>
@@ -19,15 +24,15 @@
   </div>
   <br />
   <div>
+    <div class="avaliableTime">Avaliable time slots:</div>
     <div class="time">
       <select
-        name="time"
-        v-model="booking.time"
-        @change="onChangeTime($event)"
         class="form-select form-control"
+        @click="onClickTime($event)"
+        v-model="booking.time"
         required
       >
-        <option>-- Select Time --</option>
+        <option>------ Select Time ------</option>
         <option v-for="item in timeSlots" v-bind:key="item">
           {{ item.start + "-" + item.end }}
         </option>
@@ -45,11 +50,13 @@
         size="30"
         required
       /><br />
-    </div>
-    <div>
+    </div><br>
+    <div align="center">
       <button type='button' v-on:click="sendBooking(); TimeStamp();"> Submit </button>
     </div>
-  </form>
+  </form></div>
+  <div class="col-sm-4"></div>
+</div>
 </template>
 
 <script>
@@ -100,15 +107,17 @@ export default {
         "Team5/Dentistimo/Reject/Booking",
         //TODO: add here all topics to subscribe to
       ],
-      onChangeTime(e) {
-        //TODO: user for form submittion
+      onClickTime(e) {
+        var tempDate = JSON.stringify(this.date)
+        if(tempDate == undefined){
+          alert('Please select a date in order to view time slots!');
+        }
       },
       onChangeDate(e) {
         this.timeSlots = [];
         var day;
-        var date;
         try {
-          date = new Date(Date.parse(e.target.value));
+          this.date = new Date(Date.parse(e.target.value));
           var weekday = new Array(
             "sunday",
             "monday",
@@ -118,7 +127,7 @@ export default {
             "friday",
             "saturday"
           );
-          day = weekday[date.getDay()];
+          day = weekday[this.date.getDay()];
         } catch (error) {
           console.log(error);
         }
@@ -138,6 +147,7 @@ export default {
       },
       dentist: {},
       timeSlots: [],
+      date: Date
     };
   },
   methods: {
@@ -220,6 +230,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
+      this.$router.push({ name: 'home'})
     },
     notifyFailure(message){
       try {
@@ -228,6 +239,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
+      this.$router.push({ name: 'home'})
     },
     reactToTimeSlots(message) {
       try {
@@ -251,47 +263,36 @@ export default {
 };
 </script>
 
-<style>
-h4 {
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  font-size: 15px;
-  padding-left: 350px;
-}
-.arrow-leftright {
-  padding-left: 350px;
-}
-h3 {
-  font-weight: 500;
-  padding-top: 20px;
-  padding-left: 350px;
-}
+<style scoped>
 .date {
   display: flex;
   align-items: center;
-  padding-top: 40px;
-  padding-left: 350px;
+  padding-left: 18%;
+  padding-top: 2%;
+  padding-bottom: 0.5%;
 }
-input {
-  margin-bottom: 20px;
+.avaliableTime{
+  padding-left: 18%;
+  padding-bottom: 1%;
 }
 .time {
+  position: relative;
   display: flex;
   align-items: center;
-  padding-top: 0px;
-  padding-left: 350px;
-  width: fit-content;
+  padding-left: 18%; 
+  width: 70%;
+  padding-bottom: 1%;
 }
-
+input{
+  width: 70%;
+}
 .userInput {
-  padding-left: 350px;
+  padding-left: 18%;
+  padding-bottom: 0.5%;
 }
-
 span::after {
-  padding-left: 5px;
+   padding-left: 5px; 
 }
-
 input:invalid + span::after {
   content: "✖";
   color: red;
@@ -304,57 +305,29 @@ input:valid + span::after {
 
 p {
   display: flex;
-  padding-top: 40px;
-  padding-left: 350px;
 }
-.hi {
+.row1 {
   background-image: linear-gradient(rgba(3, 3, 3, 0.7), rgba(3, 3, 3, 0.7)),
     url(../assets/smiling_woman_with_perfect_white_teeth-opt.png);
   background-size: cover;
   background-position: bottom;
-  height: 30vh;
+  height: 40vh;
   background-attachment: fixed;
   color: white;
 }
-.button{
-
-}
-.days {
-  width: 1100px;
-  padding-left: 350px;
-}
-
-.day {
-  width: 120px;
-  height: 230px;
-  background-color: #f4f7ff;
-  padding: 10px;
-  float: left;
-  margin-right: 7px;
-  margin-bottom: 5px;
-}
-
-.datelabel {
-  margin-bottom: 15px;
-  color: rgb(77, 72, 72);
-}
-
-.timeslot {
-  background-color: #d5e7ff;
-  width: auto;
-  height: 30px;
-  color: rgb(49, 88, 138);
-  font-weight: 500;
-  padding: 7px;
-  margin-top: 5px;
-  font-size: 14px;
-  border-radius: 3px;
-  vertical-align: center;
+ button {
+  background-color: #409443;
+  border: none;
+  color: white;
   text-align: center;
+  text-decoration: none;
+  display: inline-block; 
+  font-size: 16px;
+  border-radius: 10px!important;
+  padding: 8px 28px;
 }
+button:hover{
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+} 
 
-.timeslot:hover {
-  background-color: #3d83d3;
-  cursor: pointer;
-}
 </style>
