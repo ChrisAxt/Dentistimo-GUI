@@ -1,7 +1,9 @@
 <template>
+<div class="row">
+  <div class="col-sm-3">
   <div class="sidebar">
     <div class="heading">
-      <h1>Dentist locations</h1>
+      <h2> Dentist locations</h2>
     </div>
     <error-message :message="this.errorMessage" v-if="!this.isOnline"></error-message>
     <div v-else id="listings" class="listings">
@@ -9,17 +11,21 @@
         {{ dentist.name }}
         <p class="address">Address: {{ dentist.address }}</p>
         <p>
-          Monday: {{ dentist.openinghours.monday }} Tuesday:
-          {{ dentist.openinghours.tuesday }} Wednesday:
-          {{ dentist.openinghours.wednesday }} Thursday:
-          {{ dentist.openinghours.thursday }} Friday:
-          {{ dentist.openinghours.friday }}
+          Monday: {{ dentist.openinghours.monday }} <br>
+          Tuesday: {{ dentist.openinghours.tuesday }} <br>
+          Wednesday: {{ dentist.openinghours.wednesday }} <br>
+          Thursday: {{ dentist.openinghours.thursday }} <br>
+          Friday: {{ dentist.openinghours.friday }}
         </p>
       </div>
     </div>
   </div>
+  </div>
+  <div class="col-sm-9">
   <div id="map" class="map"></div>
   <div id="app"></div>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -69,9 +75,22 @@ export default {
       errorMessage: "We are experiencing difficulties. Please try again later",
       map: {},
       dentists: [],
+       // circuit breaker variables
+      circuit: undefined,
+          circuitTimeout: {
+            timeout: 1000,
+            errorThresholdPercentage: 50,
+            resetTimeout: 5500
+          }
     };
   },
   methods: {
+
+       // initializing circuit breaker
+    createdCircuit() {
+     this.circuit = new circuitBreaker(),
+      this.circuitTimeout
+    },
     // Parsing the received binary array to JSON objects //
     decodeBinArray(binArray) {
       try {
@@ -205,26 +224,27 @@ export default {
 };
 </script>
 
-<style>
+<style >
 p {
   font-size: small;
   font-weight: lighter;
   position: relative;
-  right: 350px;
 }
 
 p.address {
   font-size: medium;
   font-weight: normal;
   white-space: nowrap;
+  
 }
 
-.button {
-  background-color: blue;
-}
 #map {
   height: 100vh;
   position: relative;
+}
+.col-sm-3{
+  overflow: auto;
+  margin: 0 auto;
 }
 .marker {
   background-image: url("../assets/be_a_denist.png");
@@ -245,9 +265,10 @@ p.address {
 }
 
 .listings {
+  padding-top: 10%;
   height: 100%;
-  overflow: auto;
   padding-bottom: 60px;
+  padding-left: 10%
 }
 
 .listings .item {
@@ -257,6 +278,7 @@ p.address {
   color: #16653a;
   font-weight: bold;
   font-size: large;
+  
 }
 
 .listings .item:last-child {
@@ -287,6 +309,7 @@ p.address {
   height: 3px;
   border-left: 0;
   background: rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
 }
 
 ::-webkit-scrollbar-track {
@@ -304,17 +327,12 @@ p.address {
 body {
   color: #404040;
   font: 400 15px/22px "Source Sans Pro", "Helvetica Neue", sans-serif;
-  margin: 0;
-  padding: 0;
   -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: 22px;
-  margin: 0;
-  font-weight: 400;
-  line-height: 20px;
-  padding: 20px 2px;
+h2 {
+  text-size-adjust: auto;
+  padding-left: 10%;
 }
 
 a {
@@ -328,28 +346,38 @@ a:hover {
 
 .sidebar {
   position: absolute;
-  width: 33.3333%;
+  width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-  overflow: hidden;
-  border-right: 1px solid rgba(0, 0, 0, 0.25);
+  border-right: 0px solid rgba(0, 0, 0, 0.25);
 }
 
 .map {
   position: absolute;
-  left: 33.3333%;
-  width: 66.6666%;
+  width: 100%;
   top: 0;
   bottom: 0;
 }
 
 .heading {
   background: #fff;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1% solid #eee;
   height: 60px;
   line-height: 60px;
-  padding: 0 10px;
 }
-
+ button {
+  background-color: #409443;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block; 
+  font-size: 16px;
+  border-radius: 5px!important;
+  padding: 4px 14px;
+}
+button:hover{
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8px 25px 0 rgba(0,0,0,0.19);
+} 
 </style>
