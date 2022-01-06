@@ -5,7 +5,7 @@
     <div class="heading">
       <h2> Dentist locations</h2>
     </div>
-    <error-message :message="this.errorMessage" v-if="this.isErrorDisplayed"></error-message>
+    <error-message :title="'Woops!'" :message="this.errorMessage" v-if="this.isErrorDisplayed"></error-message>
     <div v-else id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}

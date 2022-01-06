@@ -1,6 +1,6 @@
 <template class="error_message">
 <div>
-  <h1 id="header">Woops!</h1>
+  <h1 id="header">{{  title }}</h1>
   <h1 id="message">{{this.message}}</h1>
   <button id="refresh-button" v-show="isButtonVisible" v-on:click="buttonClicked"> {{buttonText}} </button>
 </div>
@@ -10,6 +10,7 @@
 export default {
   name: "ErrorMessage",
   props: {
+    title: String,
     message: String,
     isButtonVisible: Boolean,
     buttonText: String

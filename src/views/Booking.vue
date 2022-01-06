@@ -5,7 +5,7 @@
   <div class="col-sm-4"></div>
   <div class="col-sm-4">
   <h1 align="center">{{dentist.name}}</h1><br>
-    <error-message v-show="!isSystemOnline" :message="errorMessage" :is-button-visible="true" :button-text="'Return to map'" @button-clicked="goToMap"></error-message>
+    <error-message v-show="!isSystemOnline" :title="'Woops!'" :message="errorMessage" :is-button-visible="true" :button-text="'Return to map'" @button-clicked="goToMap"></error-message>
   <div class="date" @change="onChangeDate($event)" v-show="isSystemOnline">
     <label for="start"
       >Please select a date and time for your appointment: &nbsp; &nbsp;
