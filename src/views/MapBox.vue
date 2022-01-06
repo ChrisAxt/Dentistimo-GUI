@@ -69,10 +69,7 @@ export default {
       },
       subscribeSuccess: false,
       subscriptionTopics: [
-        'Team5/Dentistimo/BookingHandler/LastWill',
         'Team5/Dentistimo/ClinicHandler/LastWill',
-        'Team5/Dentistimo/TimeSlotGenerator/LastWill',
-        'Team5/Dentistimo/AvailabilityChecker/LastWill',
         "stored_new_clinic"
       ],
       errorMessage: "We are experiencing difficulties. Please try again later",

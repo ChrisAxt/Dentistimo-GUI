@@ -5,12 +5,12 @@
   <div class="col-sm-4"></div>
   <div class="col-sm-4">
   <h1 align="center">{{dentist.name}}</h1><br>
-  <div class="date" @change="onChangeDate($event)">
+    <error-message v-show="!isSystemOnline" :message="errorMessage" :is-button-visible="true" :button-text="'Return to map'" @button-clicked="goToMap"></error-message>
+  <div class="date" @change="onChangeDate($event)" v-show="isSystemOnline">
     <label for="start"
       >Please select a date and time for your appointment: &nbsp; &nbsp;
       <br /><br />
-      <input
-        v-model= "booking.date"
+      <input v-model= "booking.date"
         type="date"
         id="start"
         name="trip-start"
@@ -23,7 +23,7 @@
     </label>
   </div>
   <br />
-  <div>
+  <div v-show="isSystemOnline">
     <div class="avaliableTime">Avaliable time slots:</div>
     <div class="time">
       <select
@@ -40,11 +40,11 @@
     </div>
   </div>
   <br />
-  <form>
+  <form v-show="isSystemOnline">
     <div class="userInput">
       <label> Social security number:</label><br />
-      <input
-        type="text"
+      <input :disabled="!isSystemOnline"
+             type="text"
         v-model="booking.ssn"
         name="fname"
         size="30"
@@ -61,15 +61,18 @@
 
 <script>
 import mqtt from "mqtt";
+import ErrorMessage from '/src/components/ErrorMessage.vue'
 
 export default {
+  components: {
+    ErrorMessage
+  },
   mounted() {
     try {
       this.dentist = JSON.parse(localStorage.getItem("selectedDentist"));
     } catch (error) {
       console.log(error);
     }
-
     this.createConnection();
   },
   data() {
@@ -105,8 +108,13 @@ export default {
         "Team5/Dentistimo/Booking/Create/Fail",
         "Team5/Dentistimo/Timeslots/Validated",
         "Team5/Dentistimo/Reject/Booking",
+        'Team5/Dentistimo/BookingHandler/LastWill',
+        'Team5/Dentistimo/TimeSlotGenerator/LastWill',
+        'Team5/Dentistimo/AvailabilityChecker/LastWill'
         //TODO: add here all topics to subscribe to
       ],
+      isSystemOnline: true,
+      errorMessage: "We are experiencing difficulties. Please try again later",
       onClickTime(e) {
         var tempDate = JSON.stringify(this.date)
         if(tempDate == undefined){
@@ -150,6 +158,15 @@ export default {
       date: Date
     };
   },
+  computed: {
+    isDisabled: function() {
+      if(this.isAvailabilityOnline && this.isTimeSlotOnline && this.isBookingOnline){
+        return false
+      }else{
+        return true
+      }
+    }
+  },
   methods: {
    // Return timestamp in milliseconds
     TimeStamp() {
@@ -191,7 +208,6 @@ export default {
       //**************************************************************************************************************************** */
       //TODO: change to recieve from availablity checker
       this.client.on("message", (topic, message) => {
-        console.log(topic);
         switch (topic) {
           case "Team5/Dentistimo/Booking/Create/Success":
             this.notifySuccess(message);
@@ -204,6 +220,11 @@ export default {
             break;
           case "Team5/Dentistimo/Reject/Booking":
             this.notifyRejection(message);
+            break;
+          case  'Team5/Dentistimo/BookingHandler/LastWill':
+          case 'Team5/Dentistimo/TimeSlotGenerator/LastWill':
+          case 'Team5/Dentistimo/AvailabilityChecker/LastWill':
+            this.isSystemOnline = false
             break;
           default:
             break;
@@ -239,7 +260,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
-      this.$router.push({ name: 'home'})
+      this.goToMap();
     },
     reactToTimeSlots(message) {
       try {
@@ -258,6 +279,9 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    goToMap: function () {
+      this.$router.push({ name: 'home'})
     }
   },
 };
