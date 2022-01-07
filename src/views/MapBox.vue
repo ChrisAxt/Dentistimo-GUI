@@ -5,7 +5,7 @@
     <div class="heading">
       <h2> Dentist locations</h2>
     </div>
-    <error-message :message="this.errorMessage" v-if="!this.isOnline"></error-message>
+    <error-message :title="'Woops!'" :message="this.errorMessage" v-if="this.isErrorDisplayed"></error-message>
     <div v-else id="listings" class="listings">
       <div class="item" v-for="dentist in dentists" v-bind:key="dentist.name">
         {{ dentist.name }}
@@ -42,10 +42,13 @@ export default {
     this.createMap();
     this.createConnection();
     this.getAllDentists();
+    setTimeout(this.checkIfDisplayError,2000)
+
   },
   data() {
     return {
       isOnline: false,
+      isErrorDisplayed : false,
       connection: {
         host: "127.0.0.1",
         port: 9001,
@@ -66,10 +69,7 @@ export default {
       },
       subscribeSuccess: false,
       subscriptionTopics: [
-        'Team5/Dentistimo/BookingHandler/LastWill',
         'Team5/Dentistimo/ClinicHandler/LastWill',
-        'Team5/Dentistimo/TimeSlotGenerator/LastWill',
-        'Team5/Dentistimo/AvailabilityChecker/LastWill',
         "stored_new_clinic"
       ],
       errorMessage: "We are experiencing difficulties. Please try again later",
@@ -78,6 +78,12 @@ export default {
     };
   },
   methods: {
+    checkIfDisplayError(){
+      console.log("checking component")
+      if(this.isOnline === false){
+        this.isErrorDisplayed = true;
+      }
+    },
     // Parsing the received binary array to JSON objects //
     decodeBinArray(binArray) {
       try {
@@ -121,10 +127,12 @@ export default {
         switch(topic){
           case "stored_new_clinic":
             this.isOnline = true
+            this.isErrorDisplayed = false
             this.generateOnMap(message);
             break;
           case 'Team5/Dentistimo/ClinicHandler/LastWill':
                 this.isOnline = false
+                this.isErrorDisplayed = true
                 break;
           default:
             break

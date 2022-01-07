@@ -1,7 +1,8 @@
 <template class="error_message">
 <div>
-  <h1 id="header">Woops!</h1>
+  <h1 id="header">{{  title }}</h1>
   <h1 id="message">{{this.message}}</h1>
+  <button id="refresh-button" v-show="isButtonVisible" v-on:click="buttonClicked"> {{buttonText}} </button>
 </div>
 </template>
 
@@ -9,7 +10,15 @@
 export default {
   name: "ErrorMessage",
   props: {
-    message: String
+    title: String,
+    message: String,
+    isButtonVisible: Boolean,
+    buttonText: String
+  },
+  methods: {
+    buttonClicked: function() {
+      this.$emit('button-clicked')
+    }
   }
 }
 </script>
@@ -30,5 +39,11 @@ div{
 #message{
   font-size: 15px;
   padding: 5px
+}
+
+#refresh-button{
+  background-color: black;
+  font-weight: bold;
+  align-self: center;
 }
 </style>
