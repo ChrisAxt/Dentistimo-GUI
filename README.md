@@ -48,35 +48,38 @@ npm run build
  ## Prerequisites
    Do you have Mosquitto installed on your computer? 
 
-  **Yes!**
+  **If yes**
 
   Continue to Setup column
 
-  **No :(**
+  **Otherwise**
 
     Start by installing Mosquitto here(https://mosquitto.org/download/)
     
-  - After installing Mosquitto, to connect to MQTT broker we need to edit the config file to accept websockets on port 1884
-     Depending on were you installed mosquitto, the path to the file could be different.
+       After installing Mosquitto, to connect to MQTT broker we need to edit the config file to accept websockets on port 1884
+       
+       Depending on were you installed mosquitto, the path to the file could be different.
 
-       **1.** Access hidden files 
+  **1.** Access hidden files 
 
           command + shift + .
 
-       **2.** Navigate to where your mosquitto.conf file is located 
+ **2.** Navigate to where your mosquitto.conf file is located 
 
           for ex. Macintosh HD > opt > homebrew > opt > mosquitto > etc > mosquitto
 
-      **3.** Open mosquttio.conf in code editor
+ **3.** Open mosquttio.conf in code editor
 
-       **4.** Add the following code at top of file and save
+ **4.** Add the following code at top of file and save
 
           port 1883
           listener 1884
           protocol websockets
 
-      **5.**
+**5.**
       Now you can continue to Setup
+
+
 
     
   ### Setup (on Mac terminal)
