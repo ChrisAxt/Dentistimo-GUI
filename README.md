@@ -1,4 +1,4 @@
-# Frontend
+# Dentistimo UI (Book appointment)
 
 ## Description
 
@@ -26,7 +26,7 @@ Dentistimo GUI provides a graphical user interface of the system using dentistry
 #### Data Output
 - The client publishes a request for dentist data every time the page reloads, which is subscribed by the clinic handler. 
 
-## Project setup
+# Project setup
 ```
 npm install
 ```
@@ -41,14 +41,45 @@ npm run serve
 npm run build
 ```
 
-### Configuration with backend
+# Backend configuration/setup
  
    In order to receive clinic data and see available bookings, it's necessary to setup a terminal running the clinic handler and one with mosquitto.
 
- **Mosquitto terminal (on Mac)**
+ ## Prerequisites
+   Do you have Mosquitto installed on your computer? 
 
-Before you continue, make sure you have [mosquitto](https://mosquitto.org/download/) installed on your computer 
+  **Yes!**
 
+  Continue to Setup column
+
+  **No :(**
+
+    Start by installing Mosquitto here(https://mosquitto.org/download/)
+    
+  - After installing Mosquitto, to connect to MQTT broker we need to edit the config file to accept websockets on port 1884
+     Depending on were you installed mosquitto, the path to the file could be different.
+
+       **1.** Access hidden files 
+
+          command + shift + .
+
+       **2.** Navigate to where your mosquitto.conf file is located 
+
+          for ex. Macintosh HD > opt > homebrew > opt > mosquitto > etc > mosquitto
+
+      **3.** Open mosquttio.conf in code editor
+
+       **4.** Add the following code at top of file and save
+
+          port 1883
+          listener 1884
+          protocol websockets
+
+      **5.**
+      Now you can continue to Setup
+
+    
+  ### Setup (on Mac terminal)
   1. Open new terminal window
 
   2. Copy and paste following command `/opt/homebrew/opt/mosquitto/sbin/mosquitto -c /opt/homebrew/etc/mosquitto/mosquitto.conf`
@@ -73,5 +104,3 @@ Before you continue, make sure you have [mosquitto](https://mosquitto.org/downlo
 
   ![Screenshot_2021-12-31_at_01.43.52](/uploads/3459b81b09343a48b094d7b0255670bc/Screenshot_2021-12-31_at_01.43.52.png)
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
