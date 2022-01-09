@@ -3,12 +3,7 @@
 ## Description
 
 This is the frontend part of the distributed system DENTISTIMO, a web application that offers a geolocalisation based dental care booking system.
-Dentistimo GUI provides a graphical user interface of the system using dentistry data from the clinic handler component. More details can be found below in this README.md file.
-
-## System Architecture - Component Diagram
-
-![_Current_state__System_Component_Diagram-21_dec.drawio](/uploads/285f0b6dba166cacab279a654d6c0432/_Current_state__System_Component_Diagram-21_dec.drawio.png)
-
+Dentistimo GUI provides a graphical user interface of the system using dentistry data from the clinic handler component. More details can be found in the component diagram in the [documentation repository](https://git.chalmers.se/courses/dit355/test-teams-formation/team-5/team-4-project). 
 
 ## Components Responsibilities
 
